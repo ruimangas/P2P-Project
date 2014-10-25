@@ -1,8 +1,6 @@
 require 'rubygems'
 require 'nokogiri' 
-require 'open-uri'
-puts "Number of nodes:"
-nodes = gets.chomp     
+require 'open-uri'    
 vec = []
 vec_2 = []
 c = 0
@@ -17,15 +15,25 @@ page.css('#nodelist > tbody > tr').each do |el|
 	end
 end
 
-while i < nodes.to_i do
-	vec_2 << vec[i]
-	i = i + 1
+puts "#{c} nodes online."
+puts "Number of nodes:"
+nodes = gets.chomp 
+
+nodes.to_i.times.map{Random.rand(c)}.each do |el|
+	vec_2 << vec[el]
 end
 
 File.open('nodes.txt', 'w') do |f|
-  vec_2.each do |ch|
-    f.write("#{ch}\n")
-  end
+	if nodes.to_i == c
+		vec.each do |ch|
+			f.write("#{ch}\n")
+		end
+		puts "#{vec.size} added to nodes.txt"
+	else
+		vec_2.uniq.each do |ch|
+			f.write("#{ch}\n")
+		end
+		puts "#{vec_2.uniq.size} added to nodes.txt"
+	end
 end
 
-puts "#{c} nodes online."
