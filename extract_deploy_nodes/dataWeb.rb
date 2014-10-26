@@ -17,17 +17,22 @@ end
 
 puts "#{c} nodes online."
 puts "Number of nodes:"
-nodes = gets.chomp
-raise TypeError, 'Invalid number of nodes' if nodes.to_i > c
+nodes = gets.chomp 
 
-nodes.to_i.times.map { Random.rand(c) }.each { |el| vec_2 << vec[el] }
+nodes.to_i.times.map{Random.rand(c)}.each do |el|
+	vec_2 << vec[el]
+end
 
 File.open('nodes.txt', 'w') do |f|
 	if nodes.to_i == c
-		vec.each { |ch| f.write("#{ch}\n") }
+		vec.each do |ch|
+			f.write("#{ch}\n")
+		end
 		puts "#{vec.size} added to nodes.txt"
 	else
-		vec_2.uniq.each { |ch| f.write("#{ch}\n") }
+		vec_2.uniq.each do |ch|
+			f.write("#{ch}\n")
+		end
 		puts "#{vec_2.uniq.size} added to nodes.txt"
 	end
 end
