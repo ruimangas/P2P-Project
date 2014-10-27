@@ -1,7 +1,5 @@
 *.class
 *.DS_Store
 *.jar
-*.war
-*.ear
 
-lib/
+my_project/lib
