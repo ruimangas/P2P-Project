@@ -63,67 +63,96 @@ public class tomp2p {
        }
 
     public static void comandLine(){
+                    
+                    String i = "";
+                    String[] commands;
+                    Scanner keyboard = new Scanner(System.in);
+
+                    try{
+
+                        while(true){
+
+                            System.out.println("operation number:");
+                            System.out.println("1 - offer an item for sale");
+                            System.out.println("2 - accept a bid");
+                            System.out.println("3 - bid on a item");
+                            System.out.println("0 - exit app");
+
+                            int numero = keyboard.nextInt();
+
+                            switch(numero){
+                                case 1:
+                                    searchFile();
+                                    break;
+                                case 2:
+                                    acceptBid();
+                                    break;
+                                case 3:
+                                    bidOnItem();
+                                    break;
+                                case 0:
+                                    peer1.shutdown();
+                                    return;
+                                default:
+                                    System.out.println("Invalid operation");
+                            }
+
+                        }
+                    }catch(Exception e){}
+                }
+                    
+                public static void searchFile(){
+                    System.out.println("not yet done");
+                }
+
+                public static void acceptBid(){
+                    System.out.println("not yet done");
+                }
+
+                public static void bidOnItem(){
+                    System.out.println("not yet done");
+                }
         
-        String i = "";
-        String[] commands;
-        Scanner sc1 = new Scanner(System.in);
         
-        do{
-        System.out.println("searchFile - para procurar ficheiro");
-            i = sc1.nextLine();    
-            commands = i.split("[ ]");
-            
-            if(commands[0].equals("searchFile"))
-                System.out.println("comando ainda nao implementado");
-            
-        }while(!commands[0].equals("logoff"));
         
-        peer1.shutdown();
-     }
-    
-    
-    
-    public static boolean passVerifier(){
-        
-        boolean accepted = false;
-        String userPass = "";
-        String[] user;
-        Scanner sc = new Scanner(System.in);
-        
-        while(true){
-            System.out.println("############");
-            System.out.println("User and Pass:");
-            userPass = sc.nextLine();
-            user = userPass.split("[ ]");
-            
-            if(user[0].equals("root") && user[1].equals("root")){
-                System.out.println("dentro da validacao");
-                accepted = true;
-                break;
-            }else{
+        public static boolean passVerifier(){
                 
-                System.out.println("Credenciais incorrectas tente outra vez");
-            }
+                boolean accepted = false;
+                Scanner sc = new Scanner(System.in);
+                Scanner sc2 = new Scanner(System.in);
+
                 
-            
-        }
-        
-        return accepted;
-   }
+                while(true){
+
+                    System.out.println("User:");
+                    String user = sc.nextLine();
+                    System.out.println("Pass:");
+                    String pass = sc.nextLine();
+                    
+                    if(user.equals("root") && user.equals("root")){
+                        System.out.println("***** WELCOME TO P2P AUCTIONS *****");
+                        accepted = true;
+                        break;
+                    }
+                    else System.out.println("wrong user or pass");
+                }
+                
+                return accepted;
+           }
     
     
     public static void main (String[] args){
         
         
- //      if(tomp2p.passVerifier()){
+       if(tomp2p.passVerifier()){
            try{
                System.out.println("antes do PeerBuilder");
             tomp2p.PeerBuilder();
            }catch(Exception e){
                System.out.println(e.getMessage());
            }
-       // tomp2p.comandLine();
-   //    }
+        tomp2p.comandLine();
+       }
         
     }
 
