@@ -14,7 +14,7 @@ public class CodeDeploy {
 		String host;
 		
 		while ((host = br.readLine()) != null) {
-   			String command = "scp " + file + " istple_seprs4@" + host + ":" + pasta;
+   			String command = "scp -r " + file + " istple_seprs4@" + host + ":" + pasta;
 			System.out.println(command);
 
 			CodeDeploy obj = new CodeDeploy(); 
