@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.*;
-
+import java.io.*;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureBootstrap;
@@ -40,7 +40,7 @@ public class tomp2p {
         
         System.out.println("depois do peerMaker");
         
-        InetAddress address = Inet4Address.getByName("127.0.0.1");
+        InetAddress address = Inet4Address.getByName("193.136.128.23");
        
         PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
         
@@ -113,32 +113,50 @@ public class tomp2p {
                     System.out.println("not yet done");
                 }
         
-        
+        public static boolean verificaUserTxt(String user){
+
+            boolean testaUser = false;
+
+            try{ 
+
+                BufferedReader br = new BufferedReader(new FileReader("users.txt"));  
+                String line = null;
+
+                while ((line = br.readLine()) != null){
+                    if(user.equals(line)){
+                        testaUser = true;
+                    }
+                }
+
+                
+            }catch(Exception e){
+                System.out.println("erro");
+            }
+
+            return testaUser;
+        }
         
         public static boolean passVerifier(){
                 
-                boolean accepted = false;
-                Scanner sc = new Scanner(System.in);
-                Scanner sc2 = new Scanner(System.in);
-
+            boolean accepted = false;
+            Scanner sc = new Scanner(System.in);
+            Scanner sc2 = new Scanner(System.in);
                 
-                while(true){
+            while(true){
 
-                    System.out.println("User:");
-                    String user = sc.nextLine();
-                    System.out.println("Pass:");
-                    String pass = sc.nextLine();
-                    
-                    if(user.equals("root") && user.equals("root")){
-                        System.out.println("***** WELCOME TO P2P AUCTIONS *****");
-                        accepted = true;
-                        break;
-                    }
-                    else System.out.println("wrong user or pass");
+                System.out.println("User:");
+                String user = sc.nextLine();
+
+                if(verificaUserTxt(user)){
+                    System.out.println("***** WELCOME TO P2P AUCTIONS *****");
+                    accepted = true;
+                    break;
                 }
-                
-                return accepted;
-           }
+                else System.out.println("wrong user or pass");
+            }
+
+            return accepted;
+        }
     
     
     public static void main (String[] args){
