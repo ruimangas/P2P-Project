@@ -2,3 +2,4 @@ tutorial para quem tiver vontade: http://tecadmin.net/install-java-8-on-centos-r
 
 planetlab-um10.di.uminho.pt
 planetlab-um00.di.uminho.pt
+planetlab1.ci.pwr.wroc.pl //sem java
