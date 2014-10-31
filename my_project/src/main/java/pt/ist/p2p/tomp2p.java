@@ -22,6 +22,7 @@ import net.tomp2p.storage.Data;
 public class tomp2p {
     
     private static Peer peer1 = null;
+    private static User u = new User();
         
     public tomp2p()  {
         
@@ -81,7 +82,7 @@ public class tomp2p {
 
                 switch(numero){
                     case 1:
-                        searchFile();
+                        offerItem();
                         break;
                     case 2:
                         acceptBid();
@@ -100,8 +101,17 @@ public class tomp2p {
         }catch(Exception e){}
     }
 
-    public static void searchFile(){
-        System.out.println("not yet done");
+    public static void offerItem(){
+        int j = 0;
+        System.out.println("Please, enter the name of the product:");
+        Scanner keyboard = new Scanner(System.in);
+        String item = keyboard.nextLine();
+        u.setOfferedItem(item);
+
+        for(String i : u.getOfferedItems()){   
+            System.out.println("Item " + j + " : " + i);
+            j+=1;
+        }
     }
 
     public static void acceptBid(){
@@ -148,6 +158,7 @@ public class tomp2p {
 
             if(verificaUserTxt(user)){
                 System.out.println("***** WELCOME TO P2P AUCTIONS *****");
+                u.setUsername(user);
                 accepted = true;
                 break;
             }
