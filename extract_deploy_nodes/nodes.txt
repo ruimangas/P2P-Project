@@ -14,7 +14,6 @@ planetlab2.cs.aueb.gr
 planetlab2.cs.uit.no
 planetlab2.eurecom.fr
 planetlab2.extern.kuleuven.be
-host1.planetlab.informatik.tu-darmstadt.de
 plab4.ple.silweb.pl
 planck227ple.test.ibbt.be
 planet-lab-node1.netgroup.uniroma2.it
@@ -127,7 +126,6 @@ pl1.tailab.eu
 pl1.uni-rostock.de
 pl2.bell-labs.fr
 pl2.ccsrfi.net
-pl2.tailab.eu
 planet1.inf.tu-dresden.de
 planet1.l3s.uni-hannover.de
 planet1.servers.ua.pt
