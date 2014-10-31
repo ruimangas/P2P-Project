@@ -40,7 +40,7 @@ public class tomp2p {
         
         System.out.println("depois do peerMaker");
         
-        InetAddress address = Inet4Address.getByName("193.136.128.23");
+        InetAddress address = Inet4Address.getByName("194.210.234.232");
        
         PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
         
@@ -55,7 +55,6 @@ public class tomp2p {
         
         FutureDHT futureDHT = peer1.get(Number160.createHash("master")).start();
         futureDHT.awaitUninterruptibly();
-        
         if (futureDHT.isSuccess()) {
             System.out.println(futureDHT.getData().getObject().toString());
         }
@@ -64,99 +63,99 @@ public class tomp2p {
 
     public static void comandLine(){
                     
-                    String i = "";
-                    String[] commands;
-                    Scanner keyboard = new Scanner(System.in);
+        String i = "";
+        String[] commands;
+        Scanner keyboard = new Scanner(System.in);
 
-                    try{
+        try{
 
-                        while(true){
-
-                            System.out.println("operation number:");
-                            System.out.println("1 - offer an item for sale");
-                            System.out.println("2 - accept a bid");
-                            System.out.println("3 - bid on a item");
-                            System.out.println("0 - exit app");
-
-                            int numero = keyboard.nextInt();
-
-                            switch(numero){
-                                case 1:
-                                    searchFile();
-                                    break;
-                                case 2:
-                                    acceptBid();
-                                    break;
-                                case 3:
-                                    bidOnItem();
-                                    break;
-                                case 0:
-                                    peer1.shutdown();
-                                    return;
-                                default:
-                                    System.out.println("Invalid operation");
-                            }
-
-                        }
-                    }catch(Exception e){}
-                }
-                    
-                public static void searchFile(){
-                    System.out.println("not yet done");
-                }
-
-                public static void acceptBid(){
-                    System.out.println("not yet done");
-                }
-
-                public static void bidOnItem(){
-                    System.out.println("not yet done");
-                }
-        
-        public static boolean verificaUserTxt(String user){
-
-            boolean testaUser = false;
-
-            try{ 
-
-                BufferedReader br = new BufferedReader(new FileReader("users.txt"));  
-                String line = null;
-
-                while ((line = br.readLine()) != null){
-                    if(user.equals(line)){
-                        testaUser = true;
-                    }
-                }
-
-                
-            }catch(Exception e){
-                System.out.println("erro");
-            }
-
-            return testaUser;
-        }
-        
-        public static boolean passVerifier(){
-                
-            boolean accepted = false;
-            Scanner sc = new Scanner(System.in);
-            Scanner sc2 = new Scanner(System.in);
-                
             while(true){
 
-                System.out.println("User:");
-                String user = sc.nextLine();
+                System.out.println("operation number:");
+                System.out.println("1 - offer an item for sale");
+                System.out.println("2 - accept a bid");
+                System.out.println("3 - bid on a item");
+                System.out.println("0 - exit app");
 
-                if(verificaUserTxt(user)){
-                    System.out.println("***** WELCOME TO P2P AUCTIONS *****");
-                    accepted = true;
-                    break;
+                int numero = keyboard.nextInt();
+
+                switch(numero){
+                    case 1:
+                        searchFile();
+                        break;
+                    case 2:
+                        acceptBid();
+                        break;
+                    case 3:
+                        bidOnItem();
+                        break;
+                    case 0:
+                        peer1.shutdown();
+                        return;
+                    default:
+                        System.out.println("Invalid operation");
                 }
-                else System.out.println("wrong user or pass");
+
+            }
+        }catch(Exception e){}
+    }
+
+    public static void searchFile(){
+        System.out.println("not yet done");
+    }
+
+    public static void acceptBid(){
+        System.out.println("not yet done");
+    }
+
+    public static void bidOnItem(){
+        System.out.println("not yet done");
+    }
+        
+    public static boolean verificaUserTxt(String user){
+
+        boolean testaUser = false;
+
+        try{ 
+
+            BufferedReader br = new BufferedReader(new FileReader("users.txt"));  
+            String line = null;
+
+            while ((line = br.readLine()) != null){
+                if(user.equals(line)){
+                    testaUser = true;
+                }
             }
 
-            return accepted;
+
+        }catch(Exception e){
+            System.out.println("erro");
         }
+
+        return testaUser;
+    }
+
+    public static boolean passVerifier(){
+
+        boolean accepted = false;
+        Scanner sc = new Scanner(System.in);
+        Scanner sc2 = new Scanner(System.in);
+
+        while(true){
+
+            System.out.println("User:");
+            String user = sc.nextLine();
+
+            if(verificaUserTxt(user)){
+                System.out.println("***** WELCOME TO P2P AUCTIONS *****");
+                accepted = true;
+                break;
+            }
+            else System.out.println("wrong user");
+        }
+
+        return accepted;
+    }
     
     
     public static void main (String[] args){
