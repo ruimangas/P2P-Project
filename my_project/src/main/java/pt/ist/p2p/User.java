@@ -4,27 +4,26 @@ import java.util.*;
 public class User{
 
 	private String username;
-	private ArrayList<String> offeredItems = new ArrayList<String>();
+    private ArrayList<String> offeredItems = new ArrayList<String>();
 
 	public User(){
 
 	}
 
-    public User(String user, String pass) {
-
-        username = user;  
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setUsername(String user){
-    	username = user;
+    public String getUsername() {
+        return username;
     }
 
     public void setOfferedItem(String item){
-    	offeredItems.add(item);
+
+        offeredItems.add(item);
     }
 
-    public ArrayList<String> getOfferedItems(){
-    	return offeredItems;
+    public ArrayList<String> getOfferedItems() {
+        return offeredItems;
     }
-
 }

@@ -6,61 +6,103 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.*;
 import java.io.*;
+
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureBootstrap;
 import net.tomp2p.futures.FutureDiscover;
+import net.tomp2p.message.Message;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.storage.Data;
 
-public class Tomp2p {
+public class tomp2p {
     
     private static Peer peer1 = null;
+
+    private static List<PeerAddress> myNeighbors = null;
+    
+
     private static User u = new User();
+        
 
-    public Tomp2p()  {
-
+    public tomp2p()  {
+        
+        
     }        
+   
+
+    public static void getMeNeighbors() throws ClassNotFoundException, IOException{
+        
+        FutureDHT futureDHT = peer1.get(Number160.createHash("neighbors")).start();
+        futureDHT.awaitUninterruptibly();
+     
+        myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
        
+        if (futureDHT.isSuccess()) {
+            myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
+        }
+        
+        if(myNeighbors.contains(peer1.getPeerAddress()))
+           myNeighbors.remove(peer1.getPeerAddress()); 
+        
+        for(PeerAddress pa : myNeighbors){
+            System.out.println(pa);
+            FutureBootstrap future2 = peer1.bootstrap().setPeerAddress(pa).start();
+            future2.awaitUninterruptibly();
+        }
+        
+    }
+    
     public static void PeerBuilder() throws ClassNotFoundException, IOException{
         
+        List<PeerAddress> myNeighbors = null;
         Random rnd = new Random();
         Bindings b = new Bindings();
+
         
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(10002).setUdpPort(10002).setBindings(b).makeAndListen();
         
         System.out.println("depois do peerMaker");
         
+
         InetAddress address = Inet4Address.getByName("194.210.234.232");
+
        
         PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
-
+        
+        
         FutureDiscover future = peer1.discover().setPeerAddress(peerAddress).start();
         future.awaitUninterruptibly();
         System.out.println("depois do discover");
         FutureBootstrap future1 = peer1.bootstrap().setPeerAddress(peerAddress).start();
         future1.awaitUninterruptibly();
-        System.out.println("my peers:" + peer1.getPeerBean().getPeerMap().getAll());
-
         
-        FutureDHT futureDHT = peer1.get(Number160.createHash("master")).start();
-        futureDHT.awaitUninterruptibly();
-        if (futureDHT.isSuccess()) {
-            System.out.println(futureDHT.getData().getObject().toString());
+        
+        
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-    }
+       
+ }
 
     public static void comandLine(){
+                    
 
+        String i = "";
+        String[] commands;
         Scanner keyboard = new Scanner(System.in);
 
         try{
 
             while(true){
+
+
+                getMeNeighbors();
 
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
@@ -73,7 +115,7 @@ public class Tomp2p {
                 switch(numero){
                     case 1:
                         offerItem();
-                        break;
+                            break;
                     case 2:
                         acceptBid();
                         break;
@@ -90,14 +132,19 @@ public class Tomp2p {
             }
         }catch(Exception e){}
     }
+                    
 
     public static void offerItem(){
-
+        int j = 0;
         System.out.println("Please, enter the name of the product:");
         Scanner keyboard = new Scanner(System.in);
-        String itemTitle = keyboard.nextLine();
-        u.setOfferedItem(itemTitle);
+        String item = keyboard.nextLine();
+        u.setOfferedItem(item);
 
+        for(String i : u.getOfferedItems()){   
+            System.out.println("Item " + j + " : " + i);
+            j+=1;
+        }
     }
 
     public static void acceptBid(){
@@ -115,7 +162,7 @@ public class Tomp2p {
         try{ 
 
             BufferedReader br = new BufferedReader(new FileReader("users.txt"));  
-            String line;
+            String line = null;
 
             while ((line = br.readLine()) != null){
                 if(user.equals(line)){
@@ -133,9 +180,10 @@ public class Tomp2p {
 
     public static boolean passVerifier(){
 
-        boolean accepted;
+        boolean accepted = false;
         Scanner sc = new Scanner(System.in);
-      
+        Scanner sc2 = new Scanner(System.in);
+
         while(true){
 
             System.out.println("User:");
@@ -157,16 +205,16 @@ public class Tomp2p {
     public static void main (String[] args){
         
         
-       if(Tomp2p.passVerifier()){
+      if(tomp2p.passVerifier()){
            try{
                System.out.println("antes do PeerBuilder");
-            Tomp2p.PeerBuilder();
+            tomp2p.PeerBuilder();
            }catch(Exception e){
                System.out.println(e.getMessage());
            }
-        Tomp2p.comandLine();
+        tomp2p.comandLine();
        }
         
     }
-
 }
+

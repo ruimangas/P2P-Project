@@ -1,5 +1,6 @@
 *.class
 *.DS_Store
 *.jar
-
+*.iml
+my_project/.idea
 my_project/lib
