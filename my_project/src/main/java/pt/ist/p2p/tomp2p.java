@@ -18,9 +18,6 @@ import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.storage.Data;
 
-
-
-
 public class tomp2p {
     
     private static Peer peer1 = null;
@@ -36,8 +33,7 @@ public class tomp2p {
         
     }        
    
-    
-    @SuppressWarnings("unchecked")
+
     public static void getMeNeighbors() throws ClassNotFoundException, IOException{
         
         FutureDHT futureDHT = peer1.get(Number160.createHash("neighbors")).start();
@@ -60,18 +56,12 @@ public class tomp2p {
         
     }
     
-    
-    
-    
-  //  public static Peer MasterPeer = masterPeer.getMasterPeer();
-    
-  
     public static void PeerBuilder() throws ClassNotFoundException, IOException{
         
         List<PeerAddress> myNeighbors = null;
         Random rnd = new Random();
         Bindings b = new Bindings();
-     // b.addInterface("eth0");
+
         
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(10002).setUdpPort(10002).setBindings(b).makeAndListen();
         
@@ -95,71 +85,68 @@ public class tomp2p {
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
        
  }
 
     public static void comandLine(){
-                    
 
-                    String i = "";
-                    String[] commands;
-                    Scanner keyboard = new Scanner(System.in);
+        Scanner keyboard = new Scanner(System.in);
 
-                    try{
+        try{
 
-                        while(true){
-                            
-                            
-                            getMeNeighbors();
-                            
-                            System.out.println("operation number:");
-                            System.out.println("1 - offer an item for sale");
-                            System.out.println("2 - accept a bid");
-                            System.out.println("3 - bid on a item");
-                            System.out.println("0 - exit app");
+            while(true){
 
-                            int numero = keyboard.nextInt();
 
-                            switch(numero){
-                                case 1:
-                                    searchFile();
-                                    break;
-                                case 2:
-                                    acceptBid();
-                                    break;
-                                case 3:
-                                    bidOnItem();
-                                    break;
-                                case 0:
-                                    peer1.shutdown();
-                                    return;
-                                default:
-                                    System.out.println("Invalid operation");
-                            }
+                getMeNeighbors();
 
-                        }
-                    }catch(Exception e){}
-                }
-                    
-                public static void searchFile(){
-                    System.out.println("not yet done");
+                System.out.println("operation number:");
+                System.out.println("1 - offer an item for sale");
+                System.out.println("2 - accept a bid");
+                System.out.println("3 - bid on a item");
+                System.out.println("0 - exit app");
+
+                int numero = keyboard.nextInt();
+
+                switch(numero){
+                    case 1:
+                        offerItem();
+                        break;
+                    case 2:
+                        acceptBid();
+                        break;
+                    case 3:
+                        bidOnItem();
+                        break;
+                    case 0:
+                        peer1.shutdown();
+                        return;
+                    default:
+                        System.out.println("Invalid operation");
                 }
 
+            }
+        }catch(Exception e){}
+    }
+                    
 
     public static void offerItem(){
-        int j = 0;
-        System.out.println("Please, enter the name of the product:");
-        Scanner keyboard = new Scanner(System.in);
-        String item = keyboard.nextLine();
-        u.setOfferedItem(item);
 
-        for(String i : u.getOfferedItems()){   
-            System.out.println("Item " + j + " : " + i);
-            j+=1;
-        }
+        Item item = new Item();
+        Scanner keyboard1 = new Scanner(System.in);
+        Scanner keyboard2 = new Scanner(System.in);
+
+        System.out.println("Please, enter the name of the product:");
+        String itemTitle = keyboard1.nextLine();
+        System.out.println("Please, enter the description of the product:");
+        String itemDescription = keyboard2.nextLine();
+
+        item.setName(itemTitle);
+        item.setDescription(itemDescription);
+        item.setDealer(u.getUsername());
+        u.setOfferedItem(itemTitle);
+
     }
 
     public static void acceptBid(){
@@ -177,7 +164,7 @@ public class tomp2p {
         try{ 
 
             BufferedReader br = new BufferedReader(new FileReader("users.txt"));  
-            String line = null;
+            String line;
 
             while ((line = br.readLine()) != null){
                 if(user.equals(line)){
@@ -195,9 +182,8 @@ public class tomp2p {
 
     public static boolean passVerifier(){
 
-        boolean accepted = false;
+        boolean accepted;
         Scanner sc = new Scanner(System.in);
-        Scanner sc2 = new Scanner(System.in);
 
         while(true){
 
@@ -220,7 +206,7 @@ public class tomp2p {
     public static void main (String[] args){
         
         
-      // if(tomp2p.passVerifier()){
+      if(tomp2p.passVerifier()){
            try{
                System.out.println("antes do PeerBuilder");
             tomp2p.PeerBuilder();
@@ -231,5 +217,5 @@ public class tomp2p {
        }
         
     }
+}
 
-//}

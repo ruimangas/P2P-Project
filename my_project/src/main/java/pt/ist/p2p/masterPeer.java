@@ -74,12 +74,9 @@ public class masterPeer {
             /*  m.setNeighbors(peerMaster.getPeerBean().getPeerMap().getAll());
               m.setSender(peerMaster.getPeerAddress());
               m.setMessageId(ID++);
-
               FutureChannelCreator fcc = peerMaster.getConnectionBean().getConnectionReservation().reserve(ID);
               fcc.awaitUninterruptibly();
-
               ChannelCreator cc = fcc.getChannelCreator();
-
               FutureResponse fr1 = new FutureResponse(m);
               fr1.awaitUninterruptibly();*/
            // s.sendTCP(m);
@@ -110,7 +107,3 @@ public class masterPeer {
   }
     
  }
-    
-    
-    
-
