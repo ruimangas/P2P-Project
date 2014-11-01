@@ -1,4 +1,13 @@
 tutorial para quem tiver vontade: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
 
-planetlab-um10.di.uminho.pt
-planetlab-um00.di.uminho.pt
+planetlab-um10.di.uminho.pt //instalado java e ant
+planetlab-um00.di.uminho.pt //instalado java e ant
+planetlab1.ci.pwr.wroc.pl //instalado java e ant
+
+planet1.servers.ua.pt
+planet2.servers.ua.pt
+planetlab2.informatik.uni-wuerzburg.de
+dfn-ple1.x-win.dfn.de
+onelab10.pl.sophia.inria.fr
+sybaris.ipv6.lip6.fr
+planetlab2.virtues.fi //ainda so java

@@ -24,8 +24,13 @@ import net.tomp2p.storage.Data;
 public class tomp2p {
     
     private static Peer peer1 = null;
+
     private static List<PeerAddress> myNeighbors = null;
     
+
+    private static User u = new User();
+        
+
     public tomp2p()  {
         
         
@@ -72,7 +77,9 @@ public class tomp2p {
         
         System.out.println("depois do peerMaker");
         
-        InetAddress address = Inet4Address.getByName("192.168.2.103");
+
+        InetAddress address = Inet4Address.getByName("194.210.234.232");
+
        
         PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
         
@@ -96,6 +103,7 @@ public class tomp2p {
 
     public static void comandLine(){
                     
+
                     String i = "";
                     String[] commands;
                     Scanner keyboard = new Scanner(System.in);
@@ -140,58 +148,73 @@ public class tomp2p {
                     System.out.println("not yet done");
                 }
 
-                public static void acceptBid(){
-                    System.out.println("not yet done");
-                }
 
-                public static void bidOnItem(){
-                    System.out.println("not yet done");
-                }
+    public static void offerItem(){
+        int j = 0;
+        System.out.println("Please, enter the name of the product:");
+        Scanner keyboard = new Scanner(System.in);
+        String item = keyboard.nextLine();
+        u.setOfferedItem(item);
+
+        for(String i : u.getOfferedItems()){   
+            System.out.println("Item " + j + " : " + i);
+            j+=1;
+        }
+    }
+
+    public static void acceptBid(){
+        System.out.println("not yet done");
+    }
+
+    public static void bidOnItem(){
+        System.out.println("not yet done");
+    }
         
-        public static boolean verificaUserTxt(String user){
+    public static boolean verificaUserTxt(String user){
 
-            boolean testaUser = false;
+        boolean testaUser = false;
 
-            try{ 
+        try{ 
 
-                BufferedReader br = new BufferedReader(new FileReader("users.txt"));  
-                String line = null;
+            BufferedReader br = new BufferedReader(new FileReader("users.txt"));  
+            String line = null;
 
-                while ((line = br.readLine()) != null){
-                    if(user.equals(line)){
-                        testaUser = true;
-                    }
+            while ((line = br.readLine()) != null){
+                if(user.equals(line)){
+                    testaUser = true;
                 }
-
-                
-            }catch(Exception e){
-                System.out.println("erro");
             }
 
-            return testaUser;
+
+        }catch(Exception e){
+            System.out.println("erro");
         }
-        
-        public static boolean passVerifier(){
-                
-            boolean accepted = false;
-            Scanner sc = new Scanner(System.in);
-            Scanner sc2 = new Scanner(System.in);
-                
-            while(true){
 
-                System.out.println("User:");
-                String user = sc.nextLine();
+        return testaUser;
+    }
 
-                if(verificaUserTxt(user)){
-                    System.out.println("***** WELCOME TO P2P AUCTIONS *****");
-                    accepted = true;
-                    break;
-                }
-                else System.out.println("wrong user or pass");
+    public static boolean passVerifier(){
+
+        boolean accepted = false;
+        Scanner sc = new Scanner(System.in);
+        Scanner sc2 = new Scanner(System.in);
+
+        while(true){
+
+            System.out.println("User:");
+            String user = sc.nextLine();
+
+            if(verificaUserTxt(user)){
+                System.out.println("***** WELCOME TO P2P AUCTIONS *****");
+                u.setUsername(user);
+                accepted = true;
+                break;
             }
-
-            return accepted;
+            else System.out.println("wrong user");
         }
+
+        return accepted;
+    }
     
     
     public static void main (String[] args){
