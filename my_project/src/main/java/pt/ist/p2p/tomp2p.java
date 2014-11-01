@@ -6,10 +6,12 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.*;
 import java.io.*;
+
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureBootstrap;
 import net.tomp2p.futures.FutureDiscover;
+import net.tomp2p.message.Message;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
 import net.tomp2p.peers.Number160;
@@ -22,16 +24,46 @@ import net.tomp2p.storage.Data;
 public class tomp2p {
     
     private static Peer peer1 = null;
-        
+    private static List<PeerAddress> myNeighbors = null;
+    
     public tomp2p()  {
         
         
     }        
    
+    
+    @SuppressWarnings("unchecked")
+    public static void getMeNeighbors() throws ClassNotFoundException, IOException{
+        
+        FutureDHT futureDHT = peer1.get(Number160.createHash("neighbors")).start();
+        futureDHT.awaitUninterruptibly();
+     
+        myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
+       
+        if (futureDHT.isSuccess()) {
+            myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
+        }
+        
+        if(myNeighbors.contains(peer1.getPeerAddress()))
+           myNeighbors.remove(peer1.getPeerAddress()); 
+        
+        for(PeerAddress pa : myNeighbors){
+            System.out.println(pa);
+            FutureBootstrap future2 = peer1.bootstrap().setPeerAddress(pa).start();
+            future2.awaitUninterruptibly();
+        }
+        
+    }
+    
+    
+    
+    
   //  public static Peer MasterPeer = masterPeer.getMasterPeer();
     
+  
     public static void PeerBuilder() throws ClassNotFoundException, IOException{
         
+        List<PeerAddress> myNeighbors = null;
         Random rnd = new Random();
         Bindings b = new Bindings();
      // b.addInterface("eth0");
@@ -40,7 +72,7 @@ public class tomp2p {
         
         System.out.println("depois do peerMaker");
         
-        InetAddress address = Inet4Address.getByName("193.136.128.23");
+        InetAddress address = Inet4Address.getByName("192.168.2.103");
        
         PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
         
@@ -50,17 +82,17 @@ public class tomp2p {
         System.out.println("depois do discover");
         FutureBootstrap future1 = peer1.bootstrap().setPeerAddress(peerAddress).start();
         future1.awaitUninterruptibly();
-        System.out.println("my peers:" + peer1.getPeerBean().getPeerMap().getAll()); 
         
         
-        FutureDHT futureDHT = peer1.get(Number160.createHash("master")).start();
-        futureDHT.awaitUninterruptibly();
         
-        if (futureDHT.isSuccess()) {
-            System.out.println(futureDHT.getData().getObject().toString());
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        
-       }
+       
+ }
 
     public static void comandLine(){
                     
@@ -71,7 +103,10 @@ public class tomp2p {
                     try{
 
                         while(true){
-
+                            
+                            
+                            getMeNeighbors();
+                            
                             System.out.println("operation number:");
                             System.out.println("1 - offer an item for sale");
                             System.out.println("2 - accept a bid");
@@ -162,7 +197,7 @@ public class tomp2p {
     public static void main (String[] args){
         
         
-       if(tomp2p.passVerifier()){
+      // if(tomp2p.passVerifier()){
            try{
                System.out.println("antes do PeerBuilder");
             tomp2p.PeerBuilder();
@@ -174,4 +209,4 @@ public class tomp2p {
         
     }
 
-}
+//}
