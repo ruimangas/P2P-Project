@@ -1,5 +1,15 @@
 *.class
 *.DS_Store
 *.jar
-
+*.iml
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.lot
+*.nlo
+*.out
+*.toc
+my_project/.idea
 my_project/lib
