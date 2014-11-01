@@ -5,10 +5,28 @@ public class User{
 
 	private String username;
     private ArrayList<String> offeredItems = new ArrayList<String>();
+    private ArrayList<String> biddedItems = new ArrayList<String>();
+    private ArrayList<String> acquiredItems = new ArrayList<String>();
 
 	public User(){
 
 	}
+
+    public ArrayList<String> getAcquiredItems() {
+        return acquiredItems;
+    }
+
+    public void setAcquiredItems(String item) {
+        this.acquiredItems.add(item);
+    }
+
+    public ArrayList<String> getBiddedItems() {
+        return biddedItems;
+    }
+
+    public void setBiddedItems(String biddedItem) {
+        this.biddedItems.add(biddedItem);
+    }
 
     public void setUsername(String username) {
         this.username = username;

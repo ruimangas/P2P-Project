@@ -8,6 +8,7 @@ public class Item{
     private String name;
     private ArrayList<String> allBidders = new ArrayList<String>();
     private String dealer;
+    private boolean sold;
 
     public Item(){
 
@@ -16,6 +17,14 @@ public class Item{
     public Item(String name, String description){
         this.name = name;
         this.description = description;
+    }
+
+    public boolean getSold(){
+        return this.sold;
+    }
+
+    public void setSold(boolean sold) {
+        this.sold = sold;
     }
 
     public String getDealer() {
