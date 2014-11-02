@@ -34,12 +34,11 @@ public class tomp2p {
     }        
    
 
+    @SuppressWarnings("unchecked")
     public static void getMeNeighbors() throws ClassNotFoundException, IOException{
         
         FutureDHT futureDHT = peer1.get(Number160.createHash("neighbors")).start();
         futureDHT.awaitUninterruptibly();
-     
-        myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
        
         if (futureDHT.isSuccess()) {
             myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
