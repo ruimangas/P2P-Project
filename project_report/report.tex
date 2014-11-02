@@ -95,11 +95,15 @@
 \begin{document}
 \maketitle
 \section{Introdução}
-\section{Kademlia vs Chord vs CAN vs Pastry}
-Nesta secção iremos analisar os quatro protocolos discutidos nas aulas, apresentando de acordo com a especificação do projecto, o protocolo mais
+\section{Kademlia vs Chord vs Pastry}
+Nesta secção iremos analisar os três protocolos discutidos nas aulas, apresentando de acordo com a especificação do projecto, o protocolo mais
 adequado para a realização do mesmo. A escolha do protocolo em questão basear-se-á nos seguintes fatores: arquitectura, \textit{lookup protocol}, \textit{routing performance}, \textit{reliability/fault resiliency} e entrada/saída de \textit{peers} na rede. De referir que todos estes algoritmos
-se baseiam em \textit{hashing} ou seja, chaves são mapeadas para os nós através de um função de \textit{hash} que pode ser resolvida por qualquer 
+se baseiam em \textit{hashing} ou seja, chaves são mapeadas para os nós através de uma função de \textit{hash} que pode ser resolvida por qualquer 
 nó presente no sistema através de \textit{queries} para outros nós.
 \section{TomP2P - Kademlia}
 \section{Estruturas de dados}
+\section{Node Join Process}
+Inicialmente apenas existe um \textit{Master Peer} que no nosso caso será o sigma.ist.utl.pt, este \textit{well known peer} é considerado como um  \textit{entry point} da rede. Quando um novo nó se quiser juntar à rede, liga-se em primeiro lugar ao \textit{Master Peer} onde recebe informações de configuração como os nós presentes na rede. Este usa esta informação para se ligar ao nós restantes.
+\section{Node leave Process}
+Quando um nó sai da rede, este terá que transferir todo o conteúdo que possui, o histórico de bids e compras efectuadas para um nó próximo de forma a ser possível a recuperação de toda esta informação quando o utilizador voltar a efectuar o login.
 \end{document}
