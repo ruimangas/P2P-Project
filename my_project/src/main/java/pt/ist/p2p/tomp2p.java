@@ -146,6 +146,8 @@ public class tomp2p {
         item.setDealer(u.getUsername());
         u.setOfferedItem(itemTitle);
 
+
+
     }
 
     public static void acceptBid(){
