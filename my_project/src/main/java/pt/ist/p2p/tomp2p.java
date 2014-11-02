@@ -57,7 +57,6 @@ public class tomp2p {
     
     public static void PeerBuilder() throws ClassNotFoundException, IOException{
         
-        List<PeerAddress> myNeighbors = null;
         Random rnd = new Random();
         Bindings b = new Bindings();
 
