@@ -34,26 +34,6 @@ public class tomp2p {
     }        
    
 
-    @SuppressWarnings("unchecked")
-    public static void getMeNeighbors() throws ClassNotFoundException, IOException{
-        
-        FutureDHT futureDHT = peer1.get(Number160.createHash("neighbors")).start();
-        futureDHT.awaitUninterruptibly();
-       
-        if (futureDHT.isSuccess()) {
-            myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
-        }
-        
-        if(myNeighbors.contains(peer1.getPeerAddress()))
-           myNeighbors.remove(peer1.getPeerAddress()); 
-        
-        for(PeerAddress pa : myNeighbors){
-            FutureBootstrap future2 = peer1.bootstrap().setPeerAddress(pa).start();
-            future2.awaitUninterruptibly();
-        }
-       
-        
-    }
     
     public static void PeerBuilder(String port) throws ClassNotFoundException, IOException{
         
@@ -86,7 +66,7 @@ public class tomp2p {
             e.printStackTrace();
         }
        
-        getMeNeighbors();
+
         
  }
 
@@ -154,24 +134,13 @@ public class tomp2p {
     }
 
     public static void acceptBid(){
-        
-        try {
-            peer1.put(Number160.createHash("peer1")).setData(new Data("Pois é mangueira")).start().awaitUninterruptibly();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.getMessage();
-        }
-        System.out.println("put done");
+   
+        System.out.println("not done");
     }
 
     public static void bidOnItem(){
         
-        try{
-           System.out.println(peer1.get(Number160.createHash("peer1")).start().awaitUninterruptibly());
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-        System.out.println("depois do get");
+        System.out.println("not done");
     }
         
     public static boolean verificaUserTxt(String user){

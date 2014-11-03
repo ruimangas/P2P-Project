@@ -34,16 +34,12 @@ public class masterPeer {
   public static void main(String[] args ){
       
       
-      
-      final List<PeerAddress> my_peers = new ArrayList<PeerAddress>(); 
-      final List<PeerAddress> my_peers_send = new ArrayList<PeerAddress>(); 
+
       int ID = 0;
       Random rnd = new Random();
       Bindings b = new Bindings();
       Number160 id = new Number160(1);
-      Message m = new Message();
-      Sender s;
-      int diff = 0;
+     
       
       try{
       
@@ -69,24 +65,7 @@ public class masterPeer {
             
              
           System.out.println("my peers:" + peerMaster.getPeerBean().getPeerMap().getAll());
-          
-          if(my_peers.containsAll( peerMaster.getPeerBean().getPeerMap().getAll()))
-              continue;
-          else{
-               
-              my_peers.clear();
-              my_peers.addAll(peerMaster.getPeerBean().getPeerMap().getAll());
-              
-              try{
-                  
-                   peerMaster.put(Number160.createHash("neighbors")).setData(new Data(my_peers)).start().awaitUninterruptibly();
-              
-              }catch(Exception e){
-                  System.out.println(e.getMessage());
-              }
-          }
-              
-             
+                    
 
       }
       
