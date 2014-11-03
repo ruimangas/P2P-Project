@@ -23,7 +23,7 @@ public class tomp2p {
     private static Peer peer1 = null;
 
     private static List<PeerAddress> myNeighbors = null;
-    
+    private static ArrayList<String> allItems = new ArrayList<String>();
 
     private static User u = new User();
         
@@ -66,7 +66,7 @@ public class tomp2p {
         System.out.println("depois do peerMaker");
         
 
-        InetAddress address = Inet4Address.getByName("194.210.234.232");
+        InetAddress address = Inet4Address.getByName("194.210.234.191");
 
        
         PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
@@ -83,7 +83,7 @@ public class tomp2p {
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
        
  }
@@ -125,7 +125,9 @@ public class tomp2p {
                 }
 
             }
-        }catch(Exception e){}
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
                     
 
@@ -144,8 +146,7 @@ public class tomp2p {
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
         u.setOfferedItem(itemTitle);
-
-
+        storeItem(item);
 
     }
 
@@ -153,8 +154,39 @@ public class tomp2p {
         System.out.println("not yet done");
     }
 
-    public static void bidOnItem(){
-        System.out.println("not yet done");
+    public static void bidOnItem() {
+
+        int i = 1;
+        Item newItem;
+        FutureDHT futureDHT = peer1.get(Number160.createHash("items")).start();
+        futureDHT.awaitUninterruptibly();
+
+        try {
+            if (futureDHT.isSuccess()) {
+                newItem = (Item) futureDHT.getData().getObject();
+                allItems.add(newItem.getName());
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Items Offered:");
+        for(String s : allItems){
+            System.out.println("item " + i + ": " + s);
+            i+=1;
+        }
+    }
+
+    public static void storeItem(Item item){
+
+        try {
+            peer1.put(Number160.createHash("items")).setData(new Data(item)).start().awaitUninterruptibly();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
         
     public static boolean verificaUserTxt(String user){

@@ -49,8 +49,7 @@ public class masterPeer {
       
           peerMaster = new PeerMaker(id).setTcpPort(10001).setUdpPort(10001).setBindings(b).makeAndListen();
           peerMaster.getConfiguration().setBehindFirewall(true);
-       //   peerMaster.put(Number160.createHash("master")).setData(new Data("teste")).start().awaitUninterruptibly();
-          
+
       }catch(Exception e){
           
           System.out.println(e.getMessage());
