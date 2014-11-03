@@ -33,41 +33,18 @@ public class tomp2p {
         
     }        
    
-
-    @SuppressWarnings("unchecked")
-    public static void getMeNeighbors() throws ClassNotFoundException, IOException{
-        
-        FutureDHT futureDHT = peer1.get(Number160.createHash("neighbors")).start();
-        futureDHT.awaitUninterruptibly();
-       
-        if (futureDHT.isSuccess()) {
-            myNeighbors = (List<PeerAddress>)futureDHT.getData().getObject();
-        }
-        
-        if(myNeighbors.contains(peer1.getPeerAddress()))
-           myNeighbors.remove(peer1.getPeerAddress()); 
-        
-        for(PeerAddress pa : myNeighbors){
-            System.out.println(pa);
-            FutureBootstrap future2 = peer1.bootstrap().setPeerAddress(pa).start();
-            future2.awaitUninterruptibly();
-        }
-        
-    }
-    
-    public static void PeerBuilder() throws ClassNotFoundException, IOException{
+    public static void PeerBuilder(String port) throws ClassNotFoundException, IOException{
         
         Random rnd = new Random();
         Bindings b = new Bindings();
 
         
-        peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(10002).setUdpPort(10002).setBindings(b).makeAndListen();
+        peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
         
         System.out.println("depois do peerMaker");
         
 
         InetAddress address = Inet4Address.getByName("194.210.234.191");
-
        
         PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
         
@@ -86,6 +63,8 @@ public class tomp2p {
             System.out.println(e.getMessage());
         }
        
+
+        
  }
 
     public static void comandLine(){
@@ -93,11 +72,11 @@ public class tomp2p {
         Scanner keyboard = new Scanner(System.in);
 
         try{
-
+            
             while(true){
 
 
-                getMeNeighbors();
+                System.out.println(peer1.getPeerBean().getPeerMap().getAll());
 
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
@@ -151,6 +130,7 @@ public class tomp2p {
     }
 
     public static void acceptBid(){
+   
         System.out.println("not yet done");
     }
 
@@ -187,7 +167,6 @@ public class tomp2p {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-    }
         
     public static boolean verificaUserTxt(String user){
 
@@ -241,7 +220,7 @@ public class tomp2p {
       if(tomp2p.passVerifier()){
            try{
                System.out.println("antes do PeerBuilder");
-            tomp2p.PeerBuilder();
+            tomp2p.PeerBuilder(args[0]);
            }catch(Exception e){
                System.out.println(e.getMessage());
            }

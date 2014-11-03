@@ -34,16 +34,12 @@ public class masterPeer {
   public static void main(String[] args ){
       
       
-      
-      final List<PeerAddress> my_peers = new ArrayList<PeerAddress>(); 
-      final List<PeerAddress> my_peers_send = new ArrayList<PeerAddress>(); 
+
       int ID = 0;
       Random rnd = new Random();
       Bindings b = new Bindings();
       Number160 id = new Number160(1);
-      Message m = new Message();
-      Sender s;
-      int diff = 0;
+     
       
       try{
       
@@ -62,44 +58,12 @@ public class masterPeer {
           try {
               Thread.sleep(10000);
           } catch (InterruptedException e) {
-              // TODO Auto-generated catch block
               e.printStackTrace();
           }
             
-             /*  m.setNeighbors(peerMaster.getPeerBean().getPeerMap().getAll());
-              m.setSender(peerMaster.getPeerAddress());
-              m.setMessageId(ID++);
-              FutureChannelCreator fcc = peerMaster.getConnectionBean().getConnectionReservation().reserve(ID);
-              fcc.awaitUninterruptibly();
-              ChannelCreator cc = fcc.getChannelCreator();
-              FutureResponse fr1 = new FutureResponse(m);
-              fr1.awaitUninterruptibly();*/
-           // s.sendTCP(m);
              
           System.out.println("my peers:" + peerMaster.getPeerBean().getPeerMap().getAll());
-          
-          if(my_peers.containsAll( peerMaster.getPeerBean().getPeerMap().getAll()))
-              continue;
-          else{
-              
-              
-              diff = peerMaster.getPeerBean().getPeerMap().getAll().size() - my_peers.size(); 
-              my_peers.clear();
-              my_peers.addAll(peerMaster.getPeerBean().getPeerMap().getAll());
-              my_peers_send.clear();
-              my_peers_send.addAll(my_peers.subList(my_peers.size() - diff, my_peers.size()));
-              
-              
-              try{
-                  
-                   peerMaster.put(Number160.createHash("neighbors")).setData(new Data(my_peers_send)).start().awaitUninterruptibly();
-              
-              }catch(Exception e){
-                  System.out.println(e.getMessage());
-              }
-          }
-              
-             
+                    
 
       }
       
