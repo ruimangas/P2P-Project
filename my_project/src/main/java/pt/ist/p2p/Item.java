@@ -1,8 +1,9 @@
 package main.java.pt.ist.p2p;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Item{
+public class Item implements Serializable{
 
     private String description;
     private String name;
