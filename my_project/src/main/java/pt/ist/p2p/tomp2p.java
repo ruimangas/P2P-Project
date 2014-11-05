@@ -130,23 +130,12 @@ public class tomp2p {
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
         u.setOfferedItem(itemTitle);
-        storeItem(item);
-
     }
 
     public static void searchItem() throws IOException, ClassNotFoundException{
 
         System.out.println("not yet done");
 
-        System.out.println("String to search");
-        Scanner keyboard1 = new Scanner(System.in);
-        String s = keyboard1.nextLine();
-
-        Number160 termKey = findReference(peer1, s);
-
-        FutureDHT futureDHT = peer1.get(termKey).start();
-        futureDHT.awaitUninterruptibly();
-        System.out.println("searched for " + s + " , found: " + futureDHT.getData().getObject());
     }
 
     public static void bidOnItem() throws IOException, ClassNotFoundException {
@@ -166,28 +155,6 @@ public class tomp2p {
         System.out.println("not yet done");
     }
 
-    public static void storeItem(Item item) throws IOException, ClassNotFoundException {
-
-        String TERM = item.getName();
-        Number160 keyTerm = Number160.createHash(TERM);
-        peer1.put(keyTerm).setObject(TERM).start();
-        String[] keywords = TERM.split(" ");
-
-        for (String keyword : keywords) {
-            Number160 keyKeyword = Number160.createHash(keyword);
-            FutureDHT futureDHT = peer1.put(keyKeyword).setObject(keyTerm).start();
-            futureDHT.awaitUninterruptibly();
-        }
-
-    }
-
-    private static Number160 findReference(final Peer peer, final String keyword) throws ClassNotFoundException, IOException {
-        Number160 keyKeyword = Number160.createHash(keyword);
-        FutureDHT futureDHT = peer.get(keyKeyword).start();
-        futureDHT.awaitUninterruptibly();
-        Number160 termKey = (Number160) futureDHT.getData().getObject();
-        return termKey;
-    }
 
     public static boolean verificaUserTxt(String user){
 
