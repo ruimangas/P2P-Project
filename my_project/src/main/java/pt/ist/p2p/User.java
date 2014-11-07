@@ -1,7 +1,8 @@
 package main.java.pt.ist.p2p;
+import java.io.Serializable;
 import java.util.*;
 
-public class User{
+public class User implements Serializable {
 
 	private String username;
     private ArrayList<String> offeredItems = new ArrayList<String>();

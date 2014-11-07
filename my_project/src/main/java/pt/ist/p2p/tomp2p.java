@@ -33,21 +33,20 @@ public class tomp2p {
 
     private static Random rnd = new Random();
 
-    public tomp2p()  {
+    public tomp2p() {
 
 
     }
 
-    public static void PeerBuilder(String port) throws ClassNotFoundException, IOException{
+    public static Peer PeerBuilder(String port) throws ClassNotFoundException, IOException {
 
         Bindings b = new Bindings();
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName("194.210.223.98");
+        InetAddress address = Inet4Address.getByName("194.210.221.113");
 
-        PeerAddress peerAddress = new PeerAddress(new Number160(1),address,10001,10001);
-
+        PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
         FutureDiscover future = peer1.discover().setPeerAddress(peerAddress).start();
         future.awaitUninterruptibly();
@@ -60,18 +59,20 @@ public class tomp2p {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
+
+        return peer1;
     }
 
-    public static void comandLine(){
+    public static void comandLine() {
 
         Scanner keyboard = new Scanner(System.in);
 
-        try{
+        try {
 
-            while(true){
+            while (true) {
 
 
-                System.out.println(peer1.getPeerBean().getPeerMap().getAll());
+                //System.out.println(peer1.getPeerBean().getPeerMap().getAll());
 
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
@@ -83,7 +84,7 @@ public class tomp2p {
                 System.out.println("0 - exit app");
 
                 int numero = keyboard.nextInt();
-                switch(numero){
+                switch (numero) {
                     case 1:
                         offerItem();
                         break;
@@ -110,7 +111,7 @@ public class tomp2p {
                 }
 
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -134,7 +135,7 @@ public class tomp2p {
 
     }
 
-    public static void searchItem() throws IOException, ClassNotFoundException{
+    public static void searchItem() throws IOException, ClassNotFoundException {
 
         System.out.println("not yet done");
 
@@ -153,16 +154,16 @@ public class tomp2p {
         System.out.println("not yet done");
     }
 
-    public static void acceptBid(){
+    public static void acceptBid() {
 
         System.out.println("not yet done");
     }
 
-    public static void itemDetails(){
+    public static void itemDetails() {
         System.out.println("not yet done");
-            }
+    }
 
-    public static void history(){
+    public static void history() {
         System.out.println("not yet done");
     }
 
@@ -189,61 +190,56 @@ public class tomp2p {
         return termKey;
     }
 
-    public static boolean verificaUserTxt(String user){
+    public static boolean passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
-        boolean testaUser = false;
+        User user;
+        System.out.println("Do you have an account?");
+        Scanner keyboard1 = new Scanner(System.in);
+        String s = keyboard1.nextLine();
 
-            try{
+        if (s.equals("yes")) {
+            System.out.println("user:");
+            Scanner keyboard2 = new Scanner(System.in);
+            String s2 = keyboard2.nextLine();
+            FutureDHT futureDHT = peer1.get(Number160.createHash(s2)).start();
+            futureDHT.awaitUninterruptibly();
+            if (futureDHT.isSuccess()) {
+                user = (User)futureDHT.getData().getObject();
+                System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
+                System.out.println("you are logged in as " + user.getUsername());
+                return true;
 
-                BufferedReader br = new BufferedReader(new FileReader("users.txt"));
-                String line;
-
-                while ((line = br.readLine()) != null){
-                    if(user.equals(line)){
-                        testaUser = true;
-                    }
-                }
-
-
-            }catch(Exception e){
-                System.out.println("erro");
+            } else {
+                System.out.println("User not found");
+                register();
+                return true;
             }
-
-            return testaUser;
         }
 
-    public static boolean passVerifier(){
+        else register();
 
-        boolean accepted;
-        Scanner sc = new Scanner(System.in);
+        return false;
+    }
 
-        while(true){
+    public static void register() throws IOException {
 
-            System.out.println("User:");
-            String user = sc.nextLine();
+        System.out.println("Register Menu");
+        System.out.println("Username:");
+        Scanner keyboard1 = new Scanner(System.in);
+        String s = keyboard1.nextLine();
+        u.setUsername(s);
+        peer1.put(Number160.createHash(s)).setData(new Data(u)).start().awaitUninterruptibly();
+        System.out.println("you are logged in as " + u.getUsername());
 
-            if(verificaUserTxt(user)){
-                System.out.println("***** WELCOME TO P2P AUCTIONS *****");
-                u.setUsername(user);
-                accepted = true;
-                break;
-            }
-            else System.out.println("wrong user");
-        }
-
-        return accepted;
     }
 
 
-    public static void main (String[] args){
+    public static void main(String[] args) throws ClassNotFoundException, IOException {
 
-        if(tomp2p.passVerifier()){
-            try{
-                tomp2p.PeerBuilder(args[0]);
-            }catch(Exception e){
-               System.out.println(e.getMessage());
-           }
+        Peer p = tomp2p.PeerBuilder(args[0]);
+        passVerifier(p);
         tomp2p.comandLine();
-        }
+
     }
 }
+
