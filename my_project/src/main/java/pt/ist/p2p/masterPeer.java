@@ -45,8 +45,7 @@ public class masterPeer {
       
           peerMaster = new PeerMaker(id).setTcpPort(10001).setUdpPort(10001).setBindings(b).makeAndListen();
           peerMaster.getConfiguration().setBehindFirewall(true);
-      
-          
+
       }catch(Exception e){
           
           System.out.println(e.getMessage());
@@ -59,7 +58,6 @@ public class masterPeer {
           try {
               Thread.sleep(10000);
           } catch (InterruptedException e) {
-              // TODO Auto-generated catch block
               e.printStackTrace();
           }
             
