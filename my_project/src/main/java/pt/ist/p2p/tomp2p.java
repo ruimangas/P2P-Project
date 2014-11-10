@@ -149,7 +149,7 @@ public class tomp2p {
         String[] choice = s.split("[ ]");
         
         
-        if(!(Arrays.asList(choice).contains("and")))
+        if(!(Arrays.asList(choice).contains("and")) || !(Arrays.asList(choice).contains("or")))
            SearchServiceDHT.search(peer1, choice[0]);
         else
             SearchServiceDHT.booleanSearch(peer1, choice[0], choice[2], choice[1]);

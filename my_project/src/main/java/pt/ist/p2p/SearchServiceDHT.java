@@ -61,8 +61,17 @@ public class SearchServiceDHT {
     public static void booleanSearch(Peer myPeer,String index1,String index2,String operator) throws ClassNotFoundException, IOException{
                   
            if(operator.toLowerCase().equals("and")){
-                   search(myPeer,index1);
-                   search(myPeer,index2);
+                search(myPeer,index1);
+                search(myPeer,index2);
+                
+                if(getMyItems().size() == 1){
+                    clearMyShit();
+                }
+           }
+           
+           if(operator.toLowerCase().equals("or")){
+               search(myPeer,index1);
+               search(myPeer,index2);
            }
                     
      }
