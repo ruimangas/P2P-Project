@@ -77,7 +77,7 @@
   </target>
 	
 	<target name="runTom" depends="compile" description="Runs the program">
-		    <java classname="main.java.pt.ist.p2p.tomp2p" fork="no">
+		    <java classname="main.java.pt.ist.p2p.Tomp2p" fork="no">
 		    	<arg value="${arg0}" />
 			  <classpath>
 			    <path refid="project.classpath" />

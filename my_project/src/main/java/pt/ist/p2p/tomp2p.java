@@ -1,5 +1,6 @@
 package main.java.pt.ist.p2p;
 
+
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -20,27 +21,34 @@ import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.replication.Replication;
 import net.tomp2p.rpc.DirectDataRPC;
 import net.tomp2p.storage.Data;
+import main.java.pt.ist.gossip.core.Gossip;
+import main.java.pt.ist.gossip.messages.*;
 
-public class Tomp2p {
+
+public class tomp2p {
 
     private static Peer peer1 = null;
+
+    private static Gossip gossip = new Gossip();
 
     private static User u = new User();
 
     private static Random rnd = new Random();
 
-    public Tomp2p() {
+    //   private static Scanner keyboard1;
+
+    public tomp2p() {
 
 
     }
 
-    public static Peer peerBuilder(String port) throws ClassNotFoundException, IOException {
+    public static Peer PeerBuilder(String port) throws ClassNotFoundException, IOException {
 
         Bindings b = new Bindings();
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName("194.210.221.113");
+        InetAddress address = Inet4Address.getByName("192.168.2.103");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -67,6 +75,9 @@ public class Tomp2p {
 
             while (true) {
 
+
+                //System.out.println(peer1.getPeerBean().getPeerMap().getAll());
+
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
                 System.out.println("2 - search for an item to buy");
@@ -84,14 +95,8 @@ public class Tomp2p {
                     case 2:
                         searchItem();
                         break;
-                    case 3:
-                        bidOnItem();
-                        break;
                     case 4:
                         acceptBid();
-                        break;
-                    case 5:
-                        itemDetails();
                         break;
                     case 6:
                         history();
@@ -112,33 +117,53 @@ public class Tomp2p {
 
     public static void offerItem() throws IOException, ClassNotFoundException {
 
-        Item item = new Item();
+        ItemSimple item = new ItemSimple();
         Scanner keyboard1 = new Scanner(System.in);
-        Scanner keyboard2 = new Scanner(System.in);
+
 
         System.out.println("Please, enter the name of the product:");
         String itemTitle = keyboard1.nextLine();
+
         System.out.println("Please, enter the description of the product:");
-        String itemDescription = keyboard2.nextLine();
+        String itemDescription = keyboard1.nextLine();
+
         item.setName(itemTitle);
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
-        u.setOfferedItem(itemTitle);
-        storeItem(item);
+
+
+        OfferItemServiceDHT.putDatItem(peer1,item);
+
+
+        //   u.setOfferedItem(itemTitle);
+        //  storeItem(item);
 
     }
 
     public static void searchItem() throws IOException, ClassNotFoundException {
 
+
+        List<ItemSimple> items = new ArrayList<ItemSimple>();
         System.out.println("String to search");
         Scanner keyboard1 = new Scanner(System.in);
         String s = keyboard1.nextLine();
 
-        Number160 termKey = findReference(peer1, s);
+        String[] choice = s.split("[ ]");
 
-        FutureDHT futureDHT = peer1.get(termKey).start();
-        futureDHT.awaitUninterruptibly();
-        System.out.println("searched for " + s + " , found: " + futureDHT.getData().getObject().toString());
+
+        if(!(Arrays.asList(choice).contains("and")) || !(Arrays.asList(choice).contains("or")))
+            SearchServiceDHT.search(peer1, choice[0]);
+        else
+            SearchServiceDHT.booleanSearch(peer1, choice[0], choice[2], choice[1]);
+
+        System.out.println("Nao explodiu");
+        items =  SearchServiceDHT.getMyItems();
+
+        for(ItemSimple i: items)
+            System.out.println(i.getName());
+
+
+        SearchServiceDHT.clearMyShit();
     }
 
     public static void bidOnItem() throws IOException, ClassNotFoundException {
@@ -158,8 +183,8 @@ public class Tomp2p {
         System.out.println("not yet done");
     }
 
-    public static void storeItem(Item item) throws IOException, ClassNotFoundException {
-        
+    public static void storeItem(ItemSimple item) throws IOException, ClassNotFoundException {
+
         String TERM = item.getName();
         Number160 keyTerm = Number160.createHash(TERM);
         peer1.put(keyTerm).setObject(TERM).start();
@@ -170,19 +195,18 @@ public class Tomp2p {
             FutureDHT futureDHT = peer1.put(keyKeyword).setObject(keyTerm).start();
             futureDHT.awaitUninterruptibly();
         }
+
     }
 
     private static Number160 findReference(final Peer peer, final String keyword) throws ClassNotFoundException, IOException {
-
         Number160 keyKeyword = Number160.createHash(keyword);
         FutureDHT futureDHT = peer.get(keyKeyword).start();
         futureDHT.awaitUninterruptibly();
-        Number160 termKey;
-        termKey = (Number160) futureDHT.getData().getObject();
+        Number160 termKey = (Number160) futureDHT.getData().getObject();
         return termKey;
     }
 
-    public static void signIn(Peer peer1) throws ClassNotFoundException, IOException {
+    public static boolean passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
         User user;
         System.out.println("Do you have an account?");
@@ -190,33 +214,29 @@ public class Tomp2p {
         String s = keyboard1.nextLine();
 
         if (s.equals("yes")) {
+
             System.out.println("user:");
             Scanner keyboard2 = new Scanner(System.in);
-            String s2 = keyboard2.nextLine();
+            String s2 = keyboard1.nextLine();
             FutureDHT futureDHT = peer1.get(Number160.createHash(s2)).start();
             futureDHT.awaitUninterruptibly();
+
             if (futureDHT.isSuccess()) {
                 user = (User)futureDHT.getData().getObject();
                 System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
                 System.out.println("you are logged in as " + user.getUsername());
+                return true;
 
             } else {
                 System.out.println("User not found");
-                signUp();
+                register();
+                return true;
             }
         }
 
-        else signUp();
-    }
+        else register();
 
-    public static void signUp() throws IOException{
-
-        System.out.println("Sign up?");
-        Scanner keyboard3 = new Scanner(System.in);
-        String s3 = keyboard3.nextLine();
-        if(s3.equals("yes"))
-            register();
-        else System.exit(0);
+        return false;
     }
 
     public static void register() throws IOException {
@@ -228,12 +248,20 @@ public class Tomp2p {
         u.setUsername(s);
         peer1.put(Number160.createHash(s)).setData(new Data(u)).start().awaitUninterruptibly();
         System.out.println("you are logged in as " + u.getUsername());
+
+    }
+
+
+    public static Gossip getGossip() {
+        return gossip;
     }
 
     public static void main(String[] args) throws ClassNotFoundException, IOException {
 
-        Peer p = Tomp2p.peerBuilder(args[0]);
-        signIn(p);
-        Tomp2p.comandLine();
+        Peer p = tomp2p.PeerBuilder(args[0]);
+        passVerifier(p);
+        tomp2p.comandLine();
+
     }
 }
+
