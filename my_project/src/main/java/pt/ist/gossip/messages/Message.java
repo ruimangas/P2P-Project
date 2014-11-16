@@ -2,14 +2,20 @@ package main.java.pt.ist.gossip.messages;
 
 public class Message {
 
-    MessageType mType;
-    int value;
-    int weight;
+    private MessageType mType;
+    private int value;
+    private int weight;
+    private int id;
 
-    public Message(MessageType mType, int value, int weight){
+    public Message(MessageType mType, int value, int weight, int id){
         this.mType = mType;
         this.value = value;
         this.weight = weight;
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getValue() {
