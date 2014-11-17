@@ -7,11 +7,17 @@ public class Message {
     private int weight;
     private int id;
 
+    public Message(){
+
+    }
+
     public Message(MessageType mType, int value, int weight, int id){
+
         this.mType = mType;
         this.value = value;
         this.weight = weight;
         this.id = id;
+
     }
 
     public int getId() {

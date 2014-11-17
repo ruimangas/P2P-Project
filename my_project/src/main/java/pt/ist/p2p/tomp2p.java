@@ -35,7 +35,7 @@ public class tomp2p {
 
     private static Random rnd = new Random();
 
-    //   private static Scanner keyboard1;
+    public final static String ADDRESS = "194.210.222.1";
 
     public tomp2p() {
 
@@ -48,7 +48,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName("192.168.2.103");
+        InetAddress address = Inet4Address.getByName(ADDRESS);
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -74,9 +74,6 @@ public class tomp2p {
         try {
 
             while (true) {
-
-
-                //System.out.println(peer1.getPeerBean().getPeerMap().getAll());
 
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
@@ -134,10 +131,6 @@ public class tomp2p {
 
         OfferItemServiceDHT.putDatItem(peer1,item);
 
-
-        //   u.setOfferedItem(itemTitle);
-        //  storeItem(item);
-
     }
 
     public static void searchItem() throws IOException, ClassNotFoundException {
@@ -183,29 +176,6 @@ public class tomp2p {
         System.out.println("not yet done");
     }
 
-    public static void storeItem(ItemSimple item) throws IOException, ClassNotFoundException {
-
-        String TERM = item.getName();
-        Number160 keyTerm = Number160.createHash(TERM);
-        peer1.put(keyTerm).setObject(TERM).start();
-        String[] keywords = TERM.split(" ");
-
-        for (String keyword : keywords) {
-            Number160 keyKeyword = Number160.createHash(keyword);
-            FutureDHT futureDHT = peer1.put(keyKeyword).setObject(keyTerm).start();
-            futureDHT.awaitUninterruptibly();
-        }
-
-    }
-
-    private static Number160 findReference(final Peer peer, final String keyword) throws ClassNotFoundException, IOException {
-        Number160 keyKeyword = Number160.createHash(keyword);
-        FutureDHT futureDHT = peer.get(keyKeyword).start();
-        futureDHT.awaitUninterruptibly();
-        Number160 termKey = (Number160) futureDHT.getData().getObject();
-        return termKey;
-    }
-
     public static boolean passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
         User user;
@@ -217,7 +187,7 @@ public class tomp2p {
 
             System.out.println("user:");
             Scanner keyboard2 = new Scanner(System.in);
-            String s2 = keyboard1.nextLine();
+            String s2 = keyboard2.nextLine();
             FutureDHT futureDHT = peer1.get(Number160.createHash(s2)).start();
             futureDHT.awaitUninterruptibly();
 
@@ -242,15 +212,28 @@ public class tomp2p {
     public static void register() throws IOException {
 
         System.out.println("Register Menu");
-        System.out.println("Username:");
-        Scanner keyboard1 = new Scanner(System.in);
-        String s = keyboard1.nextLine();
-        u.setUsername(s);
-        peer1.put(Number160.createHash(s)).setData(new Data(u)).start().awaitUninterruptibly();
-        System.out.println("you are logged in as " + u.getUsername());
 
+        while(true) {
+
+            System.out.println("Username:");
+
+            Scanner keyboard1 = new Scanner(System.in);
+            String s = keyboard1.nextLine();
+
+            FutureDHT futureDHT = peer1.get(Number160.createHash(s)).start();
+            futureDHT.awaitUninterruptibly();
+
+            if (futureDHT.isSuccess()) {
+                System.out.println("user already exists. Please choose another username");
+
+            } else {
+                u.setUsername(s);
+                peer1.put(Number160.createHash(s)).setData(new Data(u)).start().awaitUninterruptibly();
+                System.out.println("you are logged in as " + u.getUsername());
+                break;
+            }
+        }
     }
-
 
     public static Gossip getGossip() {
         return gossip;
