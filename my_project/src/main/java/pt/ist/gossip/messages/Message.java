@@ -1,6 +1,8 @@
 package main.java.pt.ist.gossip.messages;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable{
 
     private MessageType mType;
     private int value;

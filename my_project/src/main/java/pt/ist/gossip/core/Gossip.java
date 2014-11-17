@@ -21,7 +21,7 @@ public class Gossip {
 
     }
 
-    public synchronized void handleMsg(Message msg, Socket s) throws IOException {
+    public synchronized void handleMsg(Message msg) throws IOException {
 
 
         if(msg.getmType().toString().equals("NODES_SUM")) {
@@ -38,17 +38,26 @@ public class Gossip {
 
         if(messageType.toString().equals("NODES_SUM")){
             msg = new Message(messageType, this.nodesSumValue/2, this.nodesWeightValue/2, this.id);
-            setActualNodesValues(this.nodesSumValue/2, this.nodesWeightValue/2);
+            this.nodesWeightValue = this.nodesSumValue/2;
+            this.nodesSumValue = this.nodesWeightValue/2;
         }
 
         return msg;
     }
 
-    private void setActualNodesValues(int nodesSumValue, int nodesWeightValue) {
+    public int calculateValue(MessageType messageType){
 
-        this.nodesWeightValue = nodesWeightValue;
-        this.nodesSumValue = nodesSumValue;
+        int totalValue = 0;
 
+        if(messageType.toString().equals("NODES_SUM")){
+
+            totalValue = this.nodesSumValue/this.nodesWeightValue;
+
+            return totalValue;
+
+        }
+
+        return totalValue;
     }
 
 
