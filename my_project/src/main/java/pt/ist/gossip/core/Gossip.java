@@ -6,9 +6,12 @@ import java.io.*;
 
 public class Gossip {
 
-    private int nodesSumValue;
-    private int nodesWeightValue;
-    private int id = 0;
+    private double nodesSumValue;
+    private double nodesWeightValue;
+    private double initialWeightValue;
+    private double initialSumValue;
+    private double id = 0;
+
 
     public Gossip(){
 
@@ -19,15 +22,28 @@ public class Gossip {
         this.nodesSumValue = nodesSumValue;
         this.nodesWeightValue = nodesWeightValue;
 
+        this.initialSumValue = nodesSumValue;
+        this.initialWeightValue = nodesWeightValue;
+
     }
 
     public synchronized void handleMsg(Message msg) throws IOException {
 
+        if(msg.getId() == this.id){
+            process(msg);
+        }
+        else if (msg.getId() > this.id){
+            resetGossip();
+            process(msg);
+        }
+    }
+
+    public synchronized void process(Message msg){
 
         if(msg.getmType().toString().equals("NODES_SUM")) {
 
-            this.nodesSumValue = this.nodesSumValue + 1;
-            this.nodesWeightValue = this.nodesWeightValue + 1;
+            this.nodesSumValue = this.nodesSumValue + msg.getValue();
+            this.nodesWeightValue = this.nodesWeightValue + msg.getWeight();
         }
 
     }
@@ -45,9 +61,9 @@ public class Gossip {
         return msg;
     }
 
-    public int calculateValue(MessageType messageType){
+    public double calculateNumberNodes(MessageType messageType){
 
-        int totalValue = 0;
+        double totalValue = 0;
 
         if(messageType.toString().equals("NODES_SUM")){
 
@@ -60,5 +76,11 @@ public class Gossip {
         return totalValue;
     }
 
+    public void resetGossip(){
+
+        this.nodesWeightValue = this.initialWeightValue;
+        this.nodesSumValue = this.initialSumValue;
+
+    }
 
 }

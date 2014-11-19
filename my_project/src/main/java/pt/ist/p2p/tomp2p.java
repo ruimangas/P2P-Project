@@ -26,8 +26,11 @@ import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.core.Gossip;
 import main.java.pt.ist.gossip.messages.*;
 
+import static main.java.pt.ist.p2p.tomp2p.getGossip;
+
 
 public class tomp2p {
+
 
     private static Peer peer1 = null;
 
@@ -37,8 +40,7 @@ public class tomp2p {
 
     private static Random rnd = new Random();
 
-    private ServerSocket serverSocket;
-    List<Socket> peers = new ArrayList<Socket>();
+    static List<Socket> peers = new ArrayList<Socket>();
     int id;
 
     public tomp2p() {
@@ -46,20 +48,6 @@ public class tomp2p {
 
     }
 
-    public tomp2p(int id){
-
-        this.id = id;
-
-        try {
-
-            serverSocket = new ServerSocket();
-            serverSocket.bind(null);
-
-        } catch (IOException e) {
-            System.out.println("Could not open socket");
-            System.exit(-1);
-        }
-    }
 
     public static Peer PeerBuilder(String port) throws ClassNotFoundException, IOException {
 
@@ -78,7 +66,7 @@ public class tomp2p {
         future1.awaitUninterruptibly();
 
         try {
-            Thread.sleep(10000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
@@ -86,7 +74,7 @@ public class tomp2p {
         return peer1;
     }
 
-    public static String getMyIp(){
+    public static String getMyIp() {
 
         String ip = null;
 
@@ -197,8 +185,7 @@ public class tomp2p {
     }
 
     public static void acceptBid() {
-
-        System.out.println("not yet done");
+        System.out.println("invalid operation");
     }
 
     public static void itemDetails() {
@@ -228,12 +215,12 @@ public class tomp2p {
                 user = (User) futureDHT.getData().getObject();
                 if (user.getUsername().equals("admin")) {
                     System.out.println("you are logged in as admin");
-                    gossip.init(1, 1);
+                    getGossip().init(1, 1);
                     return true;
                 } else {
                     System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
                     System.out.println("you are logged in as " + user.getUsername());
-                    gossip.init(1, 0);
+                    getGossip().init(1, 0);
                     return true;
                 }
 
@@ -284,119 +271,52 @@ public class tomp2p {
         return gossip;
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, IOException {
+    public void sendMessages(MessageType mType) throws IOException {
 
         Random random = new Random();
 
-        Peer p = tomp2p.PeerBuilder(args[0]);
+        Message msg;
+        msg = getGossip().getMessage(mType);
 
-        tomp2p tom = new tomp2p(random.nextInt(1000));
-        tom.connect(Integer.parseInt(args[0]));
-        tom.acceptConnections();
+        FutureDHT futureDHT = peer1.send(Number160.createHash(random.nextInt())).setObject(msg).start();
+        futureDHT.awaitUninterruptibly();
+
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, IOException {
+
+        //tomp2p tom = new tomp2p();
+
+        Peer p = tomp2p.PeerBuilder(args[0]);
 
         registerAdmin();
         passVerifier(p);
+
+        //new sendThread(tom);
         tomp2p.comandLine();
 
     }
+}
 
-    public void sendMessages(MessageType mType) throws IOException{
+class sendThread extends Thread {
+    tomp2p sv;
 
-        Message msg;
-        ObjectOutputStream outMessage;
+    public sendThread(tomp2p sv){
+        this.sv = sv;
+    }
 
-        synchronized (this){
-
-            for (Socket s : peers){
-                msg = gossip.getMessage(mType);
-                outMessage = new ObjectOutputStream(s.getOutputStream());
-                outMessage.writeObject(msg);
+    @Override
+    public void run() {
+        try{
+            while (true){
+                Thread.sleep(5);
+                sv.sendMessages(MessageType.NODES_SUM);
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
-
-    public void connect(int port) throws IOException, ClassNotFoundException {
-
-        Socket sock = new Socket(getMyIp(), port);
-        synchronized (this) {
-            peers.add(sock);
-        }
-
-        new clientThread(this, sock).start();
-    }
-
-
-    void acceptConnections() throws IOException {
-
-       new waitingThread(this, this.serverSocket);
-
-    }
-
-
-    class clientThread extends Thread {
-
-        tomp2p sv;
-        Socket socket;
-
-        public clientThread(tomp2p sv, Socket socket){
-
-            this.sv = sv;
-            this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            Message msg;
-            ObjectInputStream inMessage;
-            try {
-                while (true) {
-
-                    //inMessage = new ObjectInputStream(socket.getInputStream());
-                    //msg = (Message) inMessage.readObject();
-                    //gossip.handleMsg(msg);
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                synchronized (sv) {
-                    sv.peers.remove(socket);
-                }
-                try {
-                    socket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-
-    }
-
-    //A ESPERA DE CENAS
-
-    class waitingThread extends Thread {
-        tomp2p sv;
-        ServerSocket socket;
-
-        public waitingThread(tomp2p sv, ServerSocket socket){
-            this.sv = sv;
-            this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            try{
-                while (true){
-                    Socket sock = serverSocket.accept();
-                    synchronized (this) {
-                        sv.peers.add(sock);
-                    }
-                    new clientThread(sv, sock).start();
-                }
-            }catch(IOException e) {
-                System.exit(-1);
-            }
-        }
-
     }
 
 }

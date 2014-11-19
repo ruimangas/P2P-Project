@@ -5,15 +5,19 @@ import java.io.Serializable;
 public class Message implements Serializable{
 
     private MessageType mType;
-    private int value;
-    private int weight;
-    private int id;
+    private double value;
+    private double weight;
+    private double id;
 
     public Message(){
 
     }
 
-    public Message(MessageType mType, int value, int weight, int id){
+    public Message(MessageType mType){
+        this.mType = mType;
+    }
+
+    public Message(MessageType mType, double value, double weight, double id){
 
         this.mType = mType;
         this.value = value;
@@ -22,15 +26,15 @@ public class Message implements Serializable{
 
     }
 
-    public int getId() {
+    public double getId() {
         return id;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 
