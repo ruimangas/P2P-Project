@@ -43,6 +43,10 @@ public class Gossip {
         }
     }
 
+    public void incrementMesg(){
+        this.id = this.id + 1;
+    }
+
     public synchronized void process(Message msg){
 
         if(msg.getmType().toString().equals("NODES_SUM")) {
