@@ -11,25 +11,26 @@ import java.util.*;
 import java.io.*;
 
 import net.tomp2p.connection.Bindings;
-import net.tomp2p.futures.FutureDHT;
-import net.tomp2p.futures.FutureBootstrap;
-import net.tomp2p.futures.FutureDiscover;
-import net.tomp2p.futures.FutureCreate;
+import net.tomp2p.connection.PeerConnection;
+import net.tomp2p.futures.*;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
+import net.tomp2p.p2p.RequestP2PConfiguration;
 import net.tomp2p.p2p.builder.PutBuilder;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.replication.Replication;
 import net.tomp2p.rpc.DirectDataRPC;
+import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.core.Gossip;
 import main.java.pt.ist.gossip.messages.*;
 
-import static main.java.pt.ist.p2p.tomp2p.getGossip;
+
 
 
 public class tomp2p {
+
 
 
     private static Peer peer1 = null;
@@ -55,7 +56,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName(getMyIp());
+        InetAddress address = Inet4Address.getByName("194.210.221.8");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -72,20 +73,6 @@ public class tomp2p {
         }
 
         return peer1;
-    }
-
-    public static String getMyIp() {
-
-        String ip = null;
-
-        try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        } catch (java.net.UnknownHostException e) {
-            System.out.println("error: ip not found");
-            e.printStackTrace();
-        }
-
-        return ip;
     }
 
     public static void comandLine() {
@@ -185,7 +172,9 @@ public class tomp2p {
     }
 
     public static void acceptBid() {
-        System.out.println("invalid operation");
+
+        System.out.println(getGossip().calculateNumberNodes(MessageType.NODES_SUM));
+
     }
 
     public static void itemDetails() {
@@ -198,7 +187,8 @@ public class tomp2p {
 
     public static boolean passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
-        User user;
+
+
         System.out.println("Do you have an account?");
         Scanner keyboard1 = new Scanner(System.in);
         String s = keyboard1.nextLine();
@@ -212,14 +202,17 @@ public class tomp2p {
             futureDHT.awaitUninterruptibly();
 
             if (futureDHT.isSuccess()) {
-                user = (User) futureDHT.getData().getObject();
-                if (user.getUsername().equals("admin")) {
+                u = (User) futureDHT.getData().getObject();
+                if (u.getUsername().equals("admin")) {
                     System.out.println("you are logged in as admin");
                     getGossip().init(1, 1);
+                    getGossip().resetGossip();
+                    getGossip().incrementMessage();
+                    System.out.println("RESET GOSSIP");
                     return true;
                 } else {
                     System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
-                    System.out.println("you are logged in as " + user.getUsername());
+                    System.out.println("you are logged in as " + u.getUsername());
                     getGossip().init(1, 0);
                     return true;
                 }
@@ -273,28 +266,48 @@ public class tomp2p {
 
     public void sendMessages(MessageType mType) throws IOException {
 
-        Random random = new Random();
+        Message msg = getGossip().getMessage(mType);
 
-        Message msg;
-        msg = getGossip().getMessage(mType);
-
-        FutureDHT futureDHT = peer1.send(Number160.createHash(random.nextInt())).setObject(msg).start();
+        RequestP2PConfiguration requestP2PConfiguration = new RequestP2PConfiguration(1,10,0);
+        FutureDHT futureDHT = peer1.send(Number160.createHash(new Random().nextInt())).setObject(msg).setRequestP2PConfiguration(requestP2PConfiguration).start();
         futureDHT.awaitUninterruptibly();
+
+        System.out.println("VALOR: " + Math.round(getGossip().calculateNumberNodes(mType)));
 
     }
 
     public static void main(String[] args) throws ClassNotFoundException, IOException {
 
-        //tomp2p tom = new tomp2p();
+        tomp2p tom = new tomp2p();
 
         Peer p = tomp2p.PeerBuilder(args[0]);
 
         registerAdmin();
         passVerifier(p);
-
-        //new sendThread(tom);
+        setupReplyHandler(p);
+        new sendThread(tom).start();
         tomp2p.comandLine();
 
+    }
+
+    private static void setupReplyHandler(Peer peer1)
+    {
+        final Peer p = peer1;
+
+        p.setObjectDataReply(new ObjectDataReply()
+        {
+            @Override
+            public Object reply( PeerAddress sender, Object request )
+                    throws Exception
+            {
+
+            System.err.println("I'm "+p.getPeerID()+" and I just got the message ["+request+"] from "+sender.getID());
+            Message m = (Message)request;
+            getGossip().handleMsg(m);
+            return null;
+
+            }
+        } );
     }
 }
 
@@ -309,7 +322,7 @@ class sendThread extends Thread {
     public void run() {
         try{
             while (true){
-                Thread.sleep(5);
+                Thread.sleep(100);
                 sv.sendMessages(MessageType.NODES_SUM);
             }
         } catch (InterruptedException e) {
