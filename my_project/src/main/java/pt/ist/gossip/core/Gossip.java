@@ -38,6 +38,10 @@ public class Gossip {
         }
     }
 
+    public void incrementMesg(){
+        this.id = this.id + 1;
+    }
+
     public synchronized void process(Message msg){
 
         if(msg.getmType().toString().equals("NODES_SUM")) {
@@ -54,8 +58,8 @@ public class Gossip {
 
         if(messageType.toString().equals("NODES_SUM")){
             msg = new Message(messageType, this.nodesSumValue/2, this.nodesWeightValue/2, this.id);
-            this.nodesWeightValue = this.nodesSumValue/2;
-            this.nodesSumValue = this.nodesWeightValue/2;
+            this.nodesSumValue = this.nodesSumValue/2;
+            this.nodesWeightValue = this.nodesWeightValue/2;
         }
 
         return msg;
