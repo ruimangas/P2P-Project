@@ -1,3 +1,4 @@
+
 package main.java.pt.ist.p2p;
 
 
@@ -165,7 +166,7 @@ public class tomp2p {
         String[] choice = s.split("[ ]");
         List<String> myOperators = new ArrayList<String>();
         List<String> myOperands = new ArrayList<String>();
-
+        List<Number160> hashSimple;
 
         for (String st : choice) {
             if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
@@ -176,15 +177,28 @@ public class tomp2p {
 
         }
 
+        try {  
+            
+            if(myOperators.size() == 0){
+            
+                hashSimple = new ArrayList<Number160>();
+                
+     
+                hashSimple = SearchServiceDHT.findReference(peer1, myOperands.get(0));
+                
+                items = SearchServiceDHT.search(peer1,hashSimple);
+             
+            
+            }else{
+                
+              items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
+                    
+            }
+        
+       }catch (Exception e) {
+          System.out.println(e.getMessage());
+       }
 
-        SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
-
-
-        try {
-            items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
         for (ItemSimple item : items)
             System.out.println("Name: " + item.getName() + " Dealer: " + item.getDealer());
 
@@ -364,6 +378,7 @@ class sendThread extends Thread {
     }
 
 }
+
 
 
 
