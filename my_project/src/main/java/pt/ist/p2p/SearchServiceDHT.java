@@ -42,8 +42,9 @@ public class SearchServiceDHT {
         
          while(counterRef < futureGet.getDataMap().size()){
              
-             myHash = (Number160)iteratorRef.next().getObject();
-             myReferences.add(myHash);
+          
+                myHash = (Number160)iteratorRef.next().getObject();
+                myReferences.add(myHash);
              
              counterRef++;
              
@@ -105,13 +106,17 @@ public class SearchServiceDHT {
             for(int i=numOperators -1;i>=0;i--){
           
                  myOperator = myOperators.get(i);
-                 theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
-               
+                 
+                 if(numOperands > 1)
+                    theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
+                 else
+                     System.out.println("Not enough arguments - Exception");
+                 
                  
               } 
              
             if(myCandidates.isEmpty())
-                System.out.println("Throw Exception!!!!!!!!");
+                System.out.println("No results found - Exception");
                
            theOnes = search(myPeer,myCandidates);   
            
@@ -120,7 +125,7 @@ public class SearchServiceDHT {
      }
         
     
-    public static void theChosenOnes(String myOperator, List<Number160> secondSearch ){
+    public static void theChosenOnes(String myOperator, List<Number160> secondSearch){
         
         
         if(myOperator.equals("and")){
@@ -138,6 +143,16 @@ public class SearchServiceDHT {
                     
                 }
             }
+        
+        if(myOperator.equals("not")){
+            for(Number160 hash : secondSearch){
+                
+                if(myCandidates.contains(hash))
+                    myCandidates.remove(hash);
+                
+            }
+            
+        }
       }
     
    public static void clearMySearch(){

@@ -181,21 +181,21 @@ public class tomp2p {
             
           
         }
-        
-       
-         SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
-        
-        
-         try{
-         items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
-         }catch(Exception e){
-             System.out.println(e.getMessage());
-         }
-         for(ItemSimple item : items)
-             System.out.println("Name: "+item.getName() + " Dealer: "+item.getDealer());
          
-         SearchServiceDHT.clearMySearch();
-        
+            
+            try{
+                
+                items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
+             
+            }catch(Exception e){
+                 System.out.println(e.getMessage());
+            }
+            
+             for(ItemSimple item : items)
+                 System.out.println("Name: "+item.getName() + " Dealer: "+item.getDealer());
+             
+             SearchServiceDHT.clearMySearch();
+       
        
        
                
