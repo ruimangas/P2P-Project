@@ -35,17 +35,23 @@ public class SearchServiceDHT {
        FutureDHT futureGet = peer.get(keyKeyword).setAll().start();
        futureGet.awaitUninterruptibly();
        List<Number160> myReferences = new ArrayList<Number160>();
-      
+       Object o;
+       
        if(futureGet.isSuccess()){
         
          Iterator<Data> iteratorRef =  futureGet.getDataMap().values().iterator();
         
          while(counterRef < futureGet.getDataMap().size()){
-             
-          
-                myHash = (Number160)iteratorRef.next().getObject();
-                myReferences.add(myHash);
-             
+                  o = iteratorRef.next().getObject();
+                
+                  if(o.getClass().equals(keyKeyword.getClass())){
+                      
+                        myHash = (Number160)o;
+                        myReferences.add(myHash);
+                        
+                } else {
+                    myReferences.add(keyKeyword);
+                }
              counterRef++;
              
          }
@@ -73,6 +79,7 @@ public class SearchServiceDHT {
                
                while(counterItem < futureGet.getDataMap().size()){
                    items.add((ItemSimple)iteratorItem.next().getObject());
+                   
                    counterItem++;
                }
               counterItem = 0;
