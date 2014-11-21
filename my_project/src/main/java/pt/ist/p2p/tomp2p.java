@@ -32,6 +32,8 @@ public class tomp2p {
     private static User u = new User();
 
     private static Random rnd = new Random();
+    
+    private static String USERNAMES = "username";
 
  //   private static Scanner keyboard1;
 
@@ -46,7 +48,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName("192.168.2.103");
+        InetAddress address = Inet4Address.getByName("192.168.56.1");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -125,43 +127,89 @@ public class tomp2p {
         System.out.println("Please, enter the description of the product:");
         String itemDescription = keyboard1.nextLine();
         
-        item.setName(itemTitle);
+        item.setName(itemTitle.toLowerCase());
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
         
         
         OfferItemServiceDHT.putDatItem(peer1,item);
         
-        
-      //   u.setOfferedItem(itemTitle);
-      //  storeItem(item);
 
     }
 
     public static void searchItem() throws IOException, ClassNotFoundException {
 
        
-        List<ItemSimple> items = new ArrayList<ItemSimple>();
-        System.out.println("String to search");
-        Scanner keyboard1 = new Scanner(System.in);
-        String s = keyboard1.nextLine();
-        
-        String[] choice = s.split("[ ]");
-        
-        
-        if(!(Arrays.asList(choice).contains("and")) || !(Arrays.asList(choice).contains("or")))
-           SearchServiceDHT.search(peer1, choice[0]);
-        else
-            SearchServiceDHT.booleanSearch(peer1, choice[0], choice[2], choice[1]);
+       List<ItemSimple> items = new ArrayList<ItemSimple>();
+       System.out.println("String to search:");
+       Scanner keyboard1 = new Scanner(System.in);
+       String s = keyboard1.nextLine();
+       ItemSimple iSimple = null;
+       String[] choice = s.split("[ ]");
+       List<String> myOperators = new ArrayList<String>();
+       List<String> myOperands = new ArrayList<String>();
 
-       System.out.println("Nao explodiu"); 
-       items =  SearchServiceDHT.getMyItems();
-        
-        for(ItemSimple i: items)
-            System.out.println(i.getName());
+       
+      
+       for(String st : choice){
+            if(st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
+                myOperators.add(st.toLowerCase());
+            else
+                myOperands.add(st);
+            
+          
+        }
         
        
-       SearchServiceDHT.clearMyShit();        
+         SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
+        
+        
+         try{
+         items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
+         }catch(Exception e){
+             System.out.println(e.getMessage());
+         }
+         for(ItemSimple item : items)
+             System.out.println("Name: "+item.getName() + " Dealer: "+item.getDealer());
+         
+         SearchServiceDHT.clearMySearch();
+        
+        
+   /*     if(numOperators == 0)
+           iSimple = SearchServiceDHT.search(peer1, choice[0]);
+        else{
+            myOperand1 =  myOperands.get(0);
+            myOperand2 =  myOperands.get(1);
+            myOperator = myOperators.get(numOperators);
+            
+            SearchServiceDHT.booleanSearch(peer1, myOperand1, myOperand2,  myOperator);
+            items = SearchServiceDHT.getMyItems();
+            myOperands.remove(0);
+            myOperands.remove(1);
+            myOperators.remove(numOperators);
+        
+        }
+*/        
+  /*      if(numOperators > 1){
+            
+            for(int i=0;i<myOperators.size();i++){
+                SearchServiceDHT.booleanSearch(peer1, myOperands.get(i), SearchServiceDHT.getMyItems().get(i).getName(),  myOperators.get(myOperators.size() - i));
+                
+                if(i == myOperators.size()-1){
+                    items =  SearchServiceDHT.getMyItems();   
+                }
+                
+                SearchServiceDHT.clearMySearch();
+            }
+        }*/
+        
+     //  System.out.println("item Procurado:");
+   //  System.out.println("tamanho da lista de referencia: "+SearchServiceDHT.references.size());
+/*       for(Number160 nr : SearchServiceDHT.references){
+           System.out.println(nr);
+       }*/
+       
+               
     }
 
     public static void bidOnItem() throws IOException, ClassNotFoundException {
@@ -181,28 +229,6 @@ public class tomp2p {
         System.out.println("not yet done");
     }
 
-    public static void storeItem(ItemSimple item) throws IOException, ClassNotFoundException {
-
-        String TERM = item.getName();
-        Number160 keyTerm = Number160.createHash(TERM);
-        peer1.put(keyTerm).setObject(TERM).start();
-        String[] keywords = TERM.split(" ");
-
-        for (String keyword : keywords) {
-            Number160 keyKeyword = Number160.createHash(keyword);
-            FutureDHT futureDHT = peer1.put(keyKeyword).setObject(keyTerm).start();
-            futureDHT.awaitUninterruptibly();
-        }
-
-    }
-
-    private static Number160 findReference(final Peer peer, final String keyword) throws ClassNotFoundException, IOException {
-        Number160 keyKeyword = Number160.createHash(keyword);
-        FutureDHT futureDHT = peer.get(keyKeyword).start();
-        futureDHT.awaitUninterruptibly();
-        Number160 termKey = (Number160) futureDHT.getData().getObject();
-        return termKey;
-    }
 
     public static boolean passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
@@ -216,7 +242,8 @@ public class tomp2p {
             System.out.println("user:");
             Scanner keyboard2 = new Scanner(System.in);
             String s2 = keyboard1.nextLine();
-            FutureDHT futureDHT = peer1.get(Number160.createHash(s2)).start();
+            String myHash = s2 + USERNAMES;
+            FutureDHT futureDHT = peer1.get(Number160.createHash(myHash)).start();
             futureDHT.awaitUninterruptibly();
             
             if (futureDHT.isSuccess()) {
@@ -243,8 +270,9 @@ public class tomp2p {
         System.out.println("Username:");
         Scanner keyboard1 = new Scanner(System.in);
         String s = keyboard1.nextLine();
+        String userKey = s + USERNAMES;
         u.setUsername(s);
-        peer1.put(Number160.createHash(s)).setData(new Data(u)).start().awaitUninterruptibly();
+        peer1.put(Number160.createHash(userKey)).setData(new Data(u)).start().awaitUninterruptibly();
         System.out.println("you are logged in as " + u.getUsername());
 
     }

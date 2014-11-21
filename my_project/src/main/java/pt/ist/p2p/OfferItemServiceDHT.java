@@ -35,7 +35,9 @@ public class OfferItemServiceDHT {
         
         
         Number160 searchKey = Number160.createHash(myTitle);
-        FutureDHT futurePut = myPeer.put(searchKey).setObject(item).start().awaitUninterruptibly();
+        System.out.println(searchKey);
+        FutureDHT futurePut = myPeer.add(searchKey).setData(new Data(item)).start();
+        futurePut.awaitUninterruptibly();
         
         String[] keyWords = myTitle.split("[ ]");
         
@@ -43,9 +45,11 @@ public class OfferItemServiceDHT {
             for(String index : keyWords){
                 
                 Number160 keyWord = Number160.createHash(index);
-                myPeer.put(keyWord).setObject(searchKey).start().awaitUninterruptibly();
+                myPeer.add(keyWord).setData(new Data(searchKey)).start().awaitUninterruptibly();
+                
             }
         }
+       
     }
     
     
