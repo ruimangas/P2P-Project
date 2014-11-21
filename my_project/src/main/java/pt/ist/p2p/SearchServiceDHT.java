@@ -22,67 +22,153 @@ import net.tomp2p.storage.Data;
 
 public class SearchServiceDHT {
 
-   private static ItemSimple item = null;
-   private static List<ItemSimple> items = new ArrayList<ItemSimple>(); 
+ 
    
-   public static Number160 findReference(Peer peer,String index) throws ClassNotFoundException, IOException{
+   private static List<Number160> myCandidates = new ArrayList<Number160>();
+  
+   
+   public static List<Number160> findReference(Peer peer,String index) throws ClassNotFoundException, IOException{
        
-       Number160 searchKey = null;
+       int counterRef = 0;
        Number160 keyKeyword = Number160.createHash(index);
-       FutureDHT futureGet = peer.get(keyKeyword).start();
+       Number160 myHash;
+       FutureDHT futureGet = peer.get(keyKeyword).setAll().start();
        futureGet.awaitUninterruptibly();
+       List<Number160> myReferences = new ArrayList<Number160>();
+       Object o;
        
        if(futureGet.isSuccess()){
-          
-           if(futureGet.getData().getObject().getClass().equals(keyKeyword.getClass())){
-              searchKey = (Number160)futureGet.getData().getObject();
-           }    
-           else{
-              searchKey = keyKeyword;
-           }   
+        
+         Iterator<Data> iteratorRef =  futureGet.getDataMap().values().iterator();
+        
+         while(counterRef < futureGet.getDataMap().size()){
+                  o = iteratorRef.next().getObject();
+                
+                  if(o.getClass().equals(keyKeyword.getClass())){
+                      
+                        myHash = (Number160)o;
+                        myReferences.add(myHash);
+                        
+                } else {
+                    myReferences.add(keyKeyword);
+                }
+             counterRef++;
+             
+         }
        }
-      
-       return searchKey;
+     
+      return myReferences;
    }
    
-    public static void search(Peer myPeer, String index) throws ClassNotFoundException, IOException{ 
-        
-        Number160 searchKey = findReference(myPeer, index); 
+   public static List<ItemSimple> search(Peer myPeer, List<Number160> references) throws ClassNotFoundException, IOException{ 
+       
+       int counterItem = 0;
+       List<Number160> search = new ArrayList<Number160>();
+       search = references;
+       
+       List<ItemSimple> items = new ArrayList<ItemSimple>();
+    
       
-        FutureDHT futureGet = myPeer.get(searchKey).start().awaitUninterruptibly();
-      
-        if(futureGet.isSuccess()){
-           item = (ItemSimple)futureGet.getData().getObject();
-        }
+        for(Number160 number: search){
             
-        items.add(item);  
+            FutureDHT futureGet = myPeer.get(number).setAll().start().awaitUninterruptibly();
+      
+            if(futureGet.isSuccess()){         
+               
+               Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
+               
+               while(counterItem < futureGet.getDataMap().size()){
+                   items.add((ItemSimple)iteratorItem.next().getObject());
+                   
+                   counterItem++;
+               }
+              counterItem = 0;
+            }
+        } 
+        return items;
     }  
            
-    public static void booleanSearch(Peer myPeer,String index1,String index2,String operator) throws ClassNotFoundException, IOException{
+    public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myOperands) throws ClassNotFoundException, IOException{
                   
-           if(operator.toLowerCase().equals("and")){
-                   search(myPeer,index1);
-                   search(myPeer,index2);
-           }
-                    
+             int numOperators = myOperators.size();
+             int numOperands = myOperands.size();
+             List<ItemSimple> theOnes = new ArrayList<ItemSimple>();
+           
+             String myOperator = "";
+             List<Number160> mySearch;
+             List<List<Number160>> mySearches = new ArrayList<List<Number160>>();
+           
+             
+             for(int j=0;j<numOperands;j++){
+                 
+                 mySearch = new ArrayList<Number160>();
+                 mySearch = findReference(myPeer,myOperands.get(j));
+                 mySearches.add(mySearch);
+                 
+             }
+           
+            
+            myCandidates = mySearches.get(0);
+             
+            for(int i=numOperators -1;i>=0;i--){
+          
+                 myOperator = myOperators.get(i);
+                 
+                 if(numOperands > 1)
+                    theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
+                 else
+                     System.out.println("Not enough arguments - Exception");
+                 
+                 
+              } 
+             
+            if(myCandidates.isEmpty())
+                System.out.println("No results found - Exception");
+               
+           theOnes = search(myPeer,myCandidates);   
+           
+           return theOnes;
+            
      }
         
     
-    public static void clearMyShit(){
-        items.clear();
+    public static void theChosenOnes(String myOperator, List<Number160> secondSearch){
         
-    }
+        
+        if(myOperator.equals("and")){
+            
+           myCandidates.retainAll(secondSearch);
+            
+        }
+        
+        if(myOperator.equals("or")){
+                
+                for(Number160 hash : secondSearch){
+                  
+                    if(!(myCandidates.contains(hash)))
+                        myCandidates.add(hash);
+                    
+                }
+            }
+        
+        if(myOperator.equals("not")){
+            for(Number160 hash : secondSearch){
+                
+                if(myCandidates.contains(hash))
+                    myCandidates.remove(hash);
+                
+            }
+            
+        }
+      }
     
-    public static List<ItemSimple> getMyItems(){
-        return items;
-    }
-  /*    FutureDHT futureDHT = myPeer.get(Number160.createHash(title)).start().awaitUninterruptibly();
+   public static void clearMySearch(){
        
-             if(futureDHT.isSuccess()){
-                 item =(ItemSimple)futureDHT.getData().getObject();
-             }*/
-        
-    }
+       myCandidates.clear();
+   }
+    
+
+ }
         
     
     

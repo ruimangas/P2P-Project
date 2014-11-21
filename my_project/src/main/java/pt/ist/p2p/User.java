@@ -8,8 +8,9 @@ public class User implements Serializable {
     private ArrayList<String> offeredItems = new ArrayList<String>();
     private ArrayList<String> biddedItems = new ArrayList<String>();
     private ArrayList<String> acquiredItems = new ArrayList<String>();
+    private String nickname;
 
-	public User(){
+    public User(){
 
 	}
 
