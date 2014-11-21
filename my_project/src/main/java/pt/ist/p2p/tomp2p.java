@@ -13,14 +13,15 @@ import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureBootstrap;
 import net.tomp2p.futures.FutureDiscover;
 import net.tomp2p.futures.FutureCreate;
-import net.tomp2p.message.Message;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
+import net.tomp2p.p2p.RequestP2PConfiguration;
 import net.tomp2p.p2p.builder.PutBuilder;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.replication.Replication;
 import net.tomp2p.rpc.DirectDataRPC;
+import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.core.Gossip;
 import main.java.pt.ist.gossip.messages.*;
@@ -36,14 +37,10 @@ public class tomp2p {
     private static User u = new User();
 
     private static Random rnd = new Random();
-    
+
     private static String USERNAMES = "username";
 
-//    static List<Socket> peers = new ArrayList<Socket>();
-    int id;
-    
     private static Gossip gossip = new Gossip();
- //   private static Scanner keyboard1;
 
     public tomp2p() {
 
@@ -141,64 +138,62 @@ public class tomp2p {
 
         ItemSimple item = new ItemSimple();
         Scanner keyboard1 = new Scanner(System.in);
-        
+
 
         System.out.println("Please, enter the name of the product:");
         String itemTitle = keyboard1.nextLine();
-        
+
         System.out.println("Please, enter the description of the product:");
         String itemDescription = keyboard1.nextLine();
-        
+
         item.setName(itemTitle.toLowerCase());
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
-        
-        
-        OfferItemServiceDHT.putDatItem(peer1,item);
-        
+
+
+        OfferItemServiceDHT.putDatItem(peer1, item);
+
 
     }
 
     public static void searchItem() throws IOException, ClassNotFoundException {
 
-       
-       List<ItemSimple> items = new ArrayList<ItemSimple>();
-       System.out.println("String to search:");
-       Scanner keyboard1 = new Scanner(System.in);
-       String s = keyboard1.nextLine();
-       ItemSimple iSimple = null;
-       String[] choice = s.split("[ ]");
-       List<String> myOperators = new ArrayList<String>();
-       List<String> myOperands = new ArrayList<String>();
 
-       
-      
-       for(String st : choice){
-            if(st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
+        List<ItemSimple> items = new ArrayList<ItemSimple>();
+        System.out.println("String to search:");
+        Scanner keyboard1 = new Scanner(System.in);
+        String s = keyboard1.nextLine();
+        String[] choice = s.split("[ ]");
+        List<String> myOperators = new ArrayList<String>();
+        List<String> myOperands = new ArrayList<String>();
+
+
+        for (String st : choice) {
+            if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
                 myOperators.add(st.toLowerCase());
             else
                 myOperands.add(st);
-            
-          
+
+
         }
-         
-            
-            try{
-                
-                items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
-             
-            }catch(Exception e){
-                 System.out.println(e.getMessage());
-            }
-            
-             for(ItemSimple item : items)
-                 System.out.println("Name: "+item.getName() + " Dealer: "+item.getDealer());
-             
-             SearchServiceDHT.clearMySearch();
-       
-       
-       
-               
+
+
+        SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
+
+
+        try {
+            items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        for (ItemSimple item : items)
+            System.out.println("Name: " + item.getName() + " Dealer: " + item.getDealer());
+
+        SearchServiceDHT.clearMySearch();
+
+
+
     }
 
     public static void bidOnItem() throws IOException, ClassNotFoundException {
@@ -227,19 +222,21 @@ public class tomp2p {
         String s = keyboard1.nextLine();
 
         if (s.equals("yes")) {
-            
+
             System.out.println("user:");
             Scanner keyboard2 = new Scanner(System.in);
-            String s2 = keyboard1.nextLine();
+            String s2 = keyboard2.nextLine();
             String myHash = s2 + USERNAMES;
             FutureDHT futureDHT = peer1.get(Number160.createHash(myHash)).start();
             futureDHT.awaitUninterruptibly();
-            
+
             if (futureDHT.isSuccess()) {
                 user = (User) futureDHT.getData().getObject();
                 if (user.getUsername().equals("admin")) {
                     System.out.println("you are logged in as admin");
                     getGossip().init(1, 1);
+                    getGossip().resetGossip();
+                    getGossip().incrementMesg();
                     return true;
                 } else {
                     System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
@@ -293,40 +290,60 @@ public class tomp2p {
         peer1.put(Number160.createHash(admin)).setData(new Data(adminUser)).start().awaitUninterruptibly();
     }
 
-    
+
     public static Gossip getGossip() {
         return gossip;
     }
 
     public void sendMessages(MessageType mType) throws IOException {
 
-        Random random = new Random();
+        Message msg = getGossip().getMessage(mType);
 
-        Message msg;
-   //     msg = getGossip().getMessage(mType);
+        RequestP2PConfiguration requestP2PConfiguration = new RequestP2PConfiguration(1,10,0);
+        FutureDHT futureDHT = peer1.send(Number160.createHash(new Random().nextInt())).setObject(msg).setRequestP2PConfiguration(requestP2PConfiguration).start();
+        futureDHT.awaitUninterruptibly();
 
-/*        FutureDHT futureDHT = peer1.send(Number160.createHash(random.nextInt())).setObject(msg).start();
-        futureDHT.awaitUninterruptibly(); */
+        System.out.println("VALOR: " + Math.round(getGossip().calculateNumberNodes(mType)));
+
+    }
+
+
+    public static void main(String[] args) throws ClassNotFoundException, IOException {
+
+        tomp2p tom = new tomp2p();
+
+        Peer p = tomp2p.PeerBuilder(args[0]);
+
+        registerAdmin();
+        passVerifier(p);
+        setupReplyHandler(p);
+        //new sendThread(tom).start();
+        tomp2p.comandLine();
 
     }
 
-    
-    
-  public static void main(String[] args) throws ClassNotFoundException, IOException {
 
+    private static void setupReplyHandler(Peer peer1)
+    {
+        final Peer p = peer1;
 
-      Peer p = tomp2p.PeerBuilder(args[0]);
+        p.setObjectDataReply(new ObjectDataReply()
+        {
+            @Override
+            public Object reply( PeerAddress sender, Object request )
+                    throws Exception
+            {
 
-      registerAdmin();
-      passVerifier(p);
+               // System.err.println("I'm "+p.getPeerID()+" and I just got the message ["+request+"] from "+sender.getID());
+                Message m = (Message)request;
+                getGossip().handleMsg(m);
+                return null;
 
-      //new sendThread(tom);
-      tomp2p.comandLine();
-
+            }
+        } );
     }
+
 }
-
-
 
 class sendThread extends Thread {
     tomp2p sv;
@@ -339,7 +356,7 @@ class sendThread extends Thread {
     public void run() {
         try{
             while (true){
-                Thread.sleep(5);
+                Thread.sleep(100);
                 sv.sendMessages(MessageType.NODES_SUM);
             }
         } catch (InterruptedException e) {
