@@ -1,3 +1,4 @@
+
 package main.java.pt.ist.p2p;
 
 
@@ -21,7 +22,10 @@ import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.replication.Replication;
 import net.tomp2p.rpc.DirectDataRPC;
 import net.tomp2p.storage.Data;
+import main.java.pt.ist.gossip.core.Gossip;
+import main.java.pt.ist.gossip.messages.*;
 
+import static main.java.pt.ist.p2p.tomp2p.getGossip;
 
 
 
@@ -35,6 +39,10 @@ public class tomp2p {
     
     private static String USERNAMES = "username";
 
+//    static List<Socket> peers = new ArrayList<Socket>();
+    int id;
+    
+    private static Gossip gossip = new Gossip();
  //   private static Scanner keyboard1;
 
     public tomp2p() {
@@ -48,7 +56,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName("192.168.56.1");
+        InetAddress address = Inet4Address.getByName(getMyIp());
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -59,12 +67,26 @@ public class tomp2p {
         future1.awaitUninterruptibly();
 
         try {
-            Thread.sleep(10000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
 
         return peer1;
+    }
+
+    public static String getMyIp() {
+
+        String ip = null;
+
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (java.net.UnknownHostException e) {
+            System.out.println("error: ip not found");
+            e.printStackTrace();
+        }
+
+        return ip;
     }
 
     public static void comandLine() {
@@ -174,40 +196,7 @@ public class tomp2p {
          
          SearchServiceDHT.clearMySearch();
         
-        
-   /*     if(numOperators == 0)
-           iSimple = SearchServiceDHT.search(peer1, choice[0]);
-        else{
-            myOperand1 =  myOperands.get(0);
-            myOperand2 =  myOperands.get(1);
-            myOperator = myOperators.get(numOperators);
-            
-            SearchServiceDHT.booleanSearch(peer1, myOperand1, myOperand2,  myOperator);
-            items = SearchServiceDHT.getMyItems();
-            myOperands.remove(0);
-            myOperands.remove(1);
-            myOperators.remove(numOperators);
-        
-        }
-*/        
-  /*      if(numOperators > 1){
-            
-            for(int i=0;i<myOperators.size();i++){
-                SearchServiceDHT.booleanSearch(peer1, myOperands.get(i), SearchServiceDHT.getMyItems().get(i).getName(),  myOperators.get(myOperators.size() - i));
-                
-                if(i == myOperators.size()-1){
-                    items =  SearchServiceDHT.getMyItems();   
-                }
-                
-                SearchServiceDHT.clearMySearch();
-            }
-        }*/
-        
-     //  System.out.println("item Procurado:");
-   //  System.out.println("tamanho da lista de referencia: "+SearchServiceDHT.references.size());
-/*       for(Number160 nr : SearchServiceDHT.references){
-           System.out.println(nr);
-       }*/
+       
        
                
     }
@@ -247,43 +236,121 @@ public class tomp2p {
             futureDHT.awaitUninterruptibly();
             
             if (futureDHT.isSuccess()) {
-                user = (User)futureDHT.getData().getObject();
-                System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
-                System.out.println("you are logged in as " + user.getUsername());
-                return true;
+                user = (User) futureDHT.getData().getObject();
+                if (user.getUsername().equals("admin")) {
+                    System.out.println("you are logged in as admin");
+                    getGossip().init(1, 1);
+                    return true;
+                } else {
+                    System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
+                    System.out.println("you are logged in as " + user.getUsername());
+                    getGossip().init(1, 0);
+                    return true;
+                }
 
             } else {
                 System.out.println("User not found");
                 register();
                 return true;
             }
-        }
-
-        else register();
+        } else register();
 
         return false;
     }
 
+
     public static void register() throws IOException {
 
         System.out.println("Register Menu");
-        System.out.println("Username:");
-        Scanner keyboard1 = new Scanner(System.in);
-        String s = keyboard1.nextLine();
-        String userKey = s + USERNAMES;
-        u.setUsername(s);
-        peer1.put(Number160.createHash(userKey)).setData(new Data(u)).start().awaitUninterruptibly();
-        System.out.println("you are logged in as " + u.getUsername());
+
+        while (true) {
+
+            System.out.println("Username:");
+
+            Scanner keyboard1 = new Scanner(System.in);
+            String s = keyboard1.nextLine();
+            String userKey = s + USERNAMES;
+            FutureDHT futureDHT = peer1.get(Number160.createHash(userKey)).start();
+            futureDHT.awaitUninterruptibly();
+
+            if (futureDHT.isSuccess()) {
+                System.out.println("user already exists. Please choose another username");
+
+            } else {
+                u.setUsername(s);
+                peer1.put(Number160.createHash(userKey)).setData(new Data(u)).start().awaitUninterruptibly();
+                System.out.println("you are logged in as " + u.getUsername());
+                break;
+            }
+        }
 
     }
 
+    public static void registerAdmin() throws IOException {
+        User adminUser = new User();
+        String admin = "admin";
+        adminUser.setUsername(admin);
+        peer1.put(Number160.createHash(admin)).setData(new Data(adminUser)).start().awaitUninterruptibly();
+    }
 
-    public static void main(String[] args) throws ClassNotFoundException, IOException {
+    
+    public static Gossip getGossip() {
+        return gossip;
+    }
 
-        Peer p = tomp2p.PeerBuilder(args[0]);
-        passVerifier(p);
-        tomp2p.comandLine();
+    public void sendMessages(MessageType mType) throws IOException {
+
+        Random random = new Random();
+
+        Message msg;
+   //     msg = getGossip().getMessage(mType);
+
+/*        FutureDHT futureDHT = peer1.send(Number160.createHash(random.nextInt())).setObject(msg).start();
+        futureDHT.awaitUninterruptibly(); */
+
+    }
+
+    
+    
+  public static void main(String[] args) throws ClassNotFoundException, IOException {
+
+
+      Peer p = tomp2p.PeerBuilder(args[0]);
+
+      registerAdmin();
+      passVerifier(p);
+
+      //new sendThread(tom);
+      tomp2p.comandLine();
 
     }
 }
+
+
+
+class sendThread extends Thread {
+    tomp2p sv;
+
+    public sendThread(tomp2p sv){
+        this.sv = sv;
+    }
+
+    @Override
+    public void run() {
+        try{
+            while (true){
+                Thread.sleep(5);
+                sv.sendMessages(MessageType.NODES_SUM);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+
+
 
