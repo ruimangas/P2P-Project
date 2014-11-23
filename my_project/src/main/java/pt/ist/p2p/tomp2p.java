@@ -231,14 +231,12 @@ public class tomp2p {
                 user = (User) futureDHT.getData().getObject();
                 if (user.getUsername().equals("admin")) {
                     System.out.println("you are logged in as admin");
-                    getGossip().init(1, 1);
-                    getGossip().resetGossip();
-                    getGossip().incrementMesg();
+                    u.setUsername("admin");
                     return true;
                 } else {
+                    u.setUsername(user.getUsername());
                     System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
                     System.out.println("you are logged in as " + user.getUsername());
-                    getGossip().init(1, 0);
                     return true;
                 }
 
@@ -251,7 +249,6 @@ public class tomp2p {
 
         return false;
     }
-
 
     public static void register() throws IOException {
 
@@ -277,30 +274,41 @@ public class tomp2p {
                 break;
             }
         }
-
     }
-
-    public static void registerAdmin() throws IOException {
-        User adminUser = new User();
-        String admin = "admin";
-        adminUser.setUsername(admin);
-        peer1.put(Number160.createHash(admin)).setData(new Data(adminUser)).start().awaitUninterruptibly();
-    }
-
 
     public static Gossip getGossip() {
         return gossip;
     }
 
-    public void sendMessages(MessageType mType) throws IOException {
+    public void sendMessages(MessageType mType, int i) throws IOException {
+
+        int in = peer1.getPeerBean().getPeerMap().getAll().size();
+
+        PeerAddress peerAddress = peer1.getPeerBean().getPeerMap().getAll().get(new Random().nextInt(in));
+
+        if(u.getUsername().equals("admin") && i%30==0){
+
+            getGossip().resetGossip();
+            getGossip().incrementMesg();
+            System.out.println("REST GOSSIP");
+        }
 
         Message msg = getGossip().getMessage(mType);
 
-        RequestP2PConfiguration requestP2PConfiguration = new RequestP2PConfiguration(1,10,0);
-        FutureDHT futureDHT = peer1.send(Number160.createHash(new Random().nextInt())).setObject(msg).setRequestP2PConfiguration(requestP2PConfiguration).start();
-        futureDHT.awaitUninterruptibly();
+        peer1.sendDirect(peerAddress).setObject(msg).start();
 
-        System.out.println("VALOR: " + Math.round(getGossip().calculateNumberNodes(mType)));
+        //System.out.println("VALOR: " + Math.round(getGossip().calculateNumberNodes(mType)));
+
+
+        System.out.println("my peers:" + peer1.getPeerBean().getPeerMap().getAll());
+    }
+
+    public static void setGossipValues(){
+
+        if(u.getUsername().equals("admin")){
+            getGossip().init(1,1);
+        }
+        else getGossip().init(1,0);
 
     }
 
@@ -311,10 +319,10 @@ public class tomp2p {
 
         Peer p = tomp2p.PeerBuilder(args[0]);
 
-        registerAdmin();
         passVerifier(p);
+        setGossipValues();
         setupReplyHandler(p);
-        //new sendThread(tom).start();
+        new sendThread(tom).start();
         tomp2p.comandLine();
 
     }
@@ -331,7 +339,7 @@ public class tomp2p {
                     throws Exception
             {
 
-               // System.err.println("I'm "+p.getPeerID()+" and I just got the message ["+request+"] from "+sender.getID());
+                //System.err.println("I'm "+p.getPeerID()+" and I just got the message ["+request+"] from "+sender.getID());
                 Message m = (Message)request;
                 getGossip().handleMsg(m);
                 return null;
@@ -344,6 +352,7 @@ public class tomp2p {
 
 class sendThread extends Thread {
     tomp2p sv;
+    int i = 0;
 
     public sendThread(tomp2p sv){
         this.sv = sv;
@@ -353,8 +362,10 @@ class sendThread extends Thread {
     public void run() {
         try{
             while (true){
-                Thread.sleep(100);
-                sv.sendMessages(MessageType.NODES_SUM);
+                Thread.sleep(1500);
+                sv.sendMessages(MessageType.NODES_SUM, i);
+                System.out.println(i);
+                i++;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
