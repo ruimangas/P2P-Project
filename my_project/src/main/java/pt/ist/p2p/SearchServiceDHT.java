@@ -45,10 +45,10 @@ public class SearchServiceDHT {
                   o = iteratorRef.next().getObject();
                 
                   if(o.getClass().equals(keyKeyword.getClass())){
-                      
+                    
                         myHash = (Number160)o;
                         myReferences.add(myHash);
-                        
+                       
                 } else {
                     myReferences.add(keyKeyword);
                 }
