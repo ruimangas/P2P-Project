@@ -26,6 +26,7 @@ import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.core.Gossip;
 import main.java.pt.ist.gossip.messages.*;
+import main.java.pt.ist.p2p.masterPeer;
 
 
 import static main.java.pt.ist.p2p.tomp2p.getGossip;
@@ -100,7 +101,7 @@ public class tomp2p {
             while (true) {
 
 
-                //System.out.println(peer1.getPeerBean().getPeerMap().getAll());
+                System.out.println(peer1.getPeerBean().getPeerMap().getAll().size());
 
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
@@ -313,20 +314,38 @@ public class tomp2p {
 
     public void sendMessages(MessageType mType, int i) throws IOException {
 
-        int in = peer1.getPeerBean().getPeerMap().getAll().size();
+        List<PeerAddress> listaPeers = peer1.getPeerBean().getPeerMap().getAll();
 
-        PeerAddress peerAddress = peer1.getPeerBean().getPeerMap().getAll().get(new Random().nextInt(in));
+        List<PeerAddress> arrayPeer = new ArrayList<PeerAddress>();
 
-        if(u.getUsername().equals("admin") && i%30==0){
-
-            getGossip().resetGossip();
-            getGossip().incrementMesg();
-
+        for(PeerAddress pa : listaPeers){
+            if (!(pa.getID().equals(new Number160(1)))){
+                arrayPeer.add(pa);
+            }
         }
 
-        Message msg = getGossip().getMessage(mType);
+        if (!arrayPeer.isEmpty()) {
 
-        peer1.sendDirect(peerAddress).setObject(msg).start();
+            int in = arrayPeer.size();
+            PeerAddress peerAddress = arrayPeer.get(new Random().nextInt(in));
+
+            if(u.getUsername().equals("admin") && i%30==0){
+
+                getGossip().resetGossip();
+                getGossip().incrementMesg();
+
+            }
+
+            if (getGossip().getNodesWeightValue()>0) {
+                Message msg = getGossip().getMessage(mType);
+                peer1.sendDirect(peerAddress).setObject(msg).start();
+            }
+
+        } else {
+
+            Message msg = getGossip().getMessage(mType);
+            peer1.sendDirect(peer1.getPeerAddress()).setObject(msg).start();;
+        }
 
     }
 
@@ -413,7 +432,6 @@ public class tomp2p {
                     throws Exception
             {
 
-                //System.err.println("I'm "+p.getPeerID()+" and I just got the message ["+request+"] from "+sender.getID());
                 Message m = (Message)request;
                 getGossip().handleMsg(m);
                 return null;
@@ -436,7 +454,7 @@ class sendThread extends Thread {
     public void run() {
         try{
             while (true){
-                Thread.sleep(1500);
+                Thread.sleep(150);
                 sv.sendMessages(MessageType.NODES_SUM, i);
                 i++;
             }

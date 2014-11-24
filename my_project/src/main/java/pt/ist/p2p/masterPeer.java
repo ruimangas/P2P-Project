@@ -23,20 +23,17 @@ import net.tomp2p.storage.Data;
 public class masterPeer {
 
     
-     private static Peer peerMaster;
-     
-        
+    private static Peer peerMaster;
+
+
     public masterPeer(){
               
     }
-    
 
-  public static void main(String[] args ){
-      
+
+    public static void main(String[] args ){
       
 
-      int ID = 0;
-      Random rnd = new Random();
       Bindings b = new Bindings();
       Number160 id = new Number160(1);
      
@@ -68,5 +65,6 @@ public class masterPeer {
       }
       
   }
-    
- }
+
+
+}

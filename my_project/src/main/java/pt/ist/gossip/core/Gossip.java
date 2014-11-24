@@ -43,6 +43,10 @@ public class Gossip {
         }
     }
 
+    public double getNodesWeightValue() {
+        return nodesWeightValue;
+    }
+
     public void incrementMesg(){
         this.id = this.id + 1;
     }
@@ -68,6 +72,8 @@ public class Gossip {
             this.nodesWeightValue = this.nodesWeightValue/2;
 
         }
+
+        //System.out.println("PESO: " + this.nodesWeightValue);
 
         return msg;
     }
