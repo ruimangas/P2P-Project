@@ -134,6 +134,7 @@ public class tomp2p {
                         userManagement();
                         break;
                     case 0:
+                        peer1.remove(Number160.createHash("activeUsers"));
                         peer1.shutdown();
                         return;
                     default:
@@ -145,6 +146,7 @@ public class tomp2p {
             System.out.println(e.getMessage());
         }
     }
+
 
     public static void offerItem() throws IOException, ClassNotFoundException {
 
@@ -374,8 +376,6 @@ public class tomp2p {
 
         if (i%30==0) {
 
-            int userInDHT = 0;
-
             FutureDHT futureDHT;
             futureDHT = peer1.get(Number160.createHash("activeUsers")).setAll().start();
             futureDHT.awaitUninterruptibly();
@@ -394,8 +394,9 @@ public class tomp2p {
                     e.printStackTrace();
                 }
 
-                userInDHT++;
             }
+
+            //System.out.println("ACTIVE USERS: " + userInDHT);
 
         }
 
