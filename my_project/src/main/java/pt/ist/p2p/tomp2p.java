@@ -7,6 +7,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.Future;
 
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureDHT;
@@ -17,6 +18,7 @@ import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
 import net.tomp2p.p2p.RequestP2PConfiguration;
 import net.tomp2p.p2p.builder.PutBuilder;
+import net.tomp2p.p2p.builder.RemoveBuilder;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.replication.Replication;
@@ -25,6 +27,8 @@ import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.core.Gossip;
 import main.java.pt.ist.gossip.messages.*;
+import main.java.pt.ist.p2p.masterPeer;
+
 
 import static main.java.pt.ist.p2p.tomp2p.getGossip;
 
@@ -41,6 +45,8 @@ public class tomp2p {
     private static String USERNAMES = "username";
 
     private static Gossip gossip = new Gossip();
+
+    private static ArrayList<String> allUsers = new ArrayList<String>();
 
     public tomp2p() {
 
@@ -90,12 +96,13 @@ public class tomp2p {
 
         Scanner keyboard = new Scanner(System.in);
 
+
         try {
 
             while (true) {
 
 
-                //System.out.println(peer1.getPeerBean().getPeerMap().getAll());
+                System.out.println(peer1.getPeerBean().getPeerMap().getAll().size());
 
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
@@ -104,6 +111,7 @@ public class tomp2p {
                 System.out.println("4 - accept a bid");
                 System.out.println("5 - view item details");
                 System.out.println("6 - purchase and bidding history");
+                System.out.println("7 - user management");
                 System.out.println("0 - exit app");
 
                 int numero = keyboard.nextInt();
@@ -117,10 +125,17 @@ public class tomp2p {
                     case 4:
                         acceptBid();
                         break;
+                    case 5:
+                        itemDetails();
+                        break;
                     case 6:
                         history();
                         break;
+                    case 7:
+                        userManagement();
+                        break;
                     case 0:
+                        peer1.remove(Number160.createHash("activeUsers"));
                         peer1.shutdown();
                         return;
                     default:
@@ -213,15 +228,34 @@ public class tomp2p {
 
     public static void acceptBid() {
 
+        for(String ola : allUsers){
+            System.out.println("LISTA: " + ola);
+        }
+
         System.out.println("not yet done");
     }
 
     public static void itemDetails() {
+
+
         System.out.println("not yet done");
     }
 
     public static void history() {
         System.out.println("not yet done");
+    }
+
+    public static void userManagement(){
+
+        if(u.getUsername().equals("admin")){
+
+            System.out.println("There are " + Math.round(getGossip().calculateNumberNodes(MessageType.NODES_SUM)) + " nodes.");
+            System.out.println("There are " + allUsers.size() + " users.");
+        }
+
+        else System.out.println("Please, log in as admin.");
+
+
     }
 
 
@@ -245,14 +279,12 @@ public class tomp2p {
                 user = (User) futureDHT.getData().getObject();
                 if (user.getUsername().equals("admin")) {
                     System.out.println("you are logged in as admin");
-                    getGossip().init(1, 1);
-                    getGossip().resetGossip();
-                    getGossip().incrementMesg();
+                    u.setUsername("admin");
                     return true;
                 } else {
+                    u.setUsername(user.getUsername());
                     System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
                     System.out.println("you are logged in as " + user.getUsername());
-                    getGossip().init(1, 0);
                     return true;
                 }
 
@@ -265,7 +297,6 @@ public class tomp2p {
 
         return false;
     }
-
 
     public static void register() throws IOException {
 
@@ -291,30 +322,106 @@ public class tomp2p {
                 break;
             }
         }
-
     }
-
-    public static void registerAdmin() throws IOException {
-        User adminUser = new User();
-        String admin = "admin";
-        adminUser.setUsername(admin);
-        peer1.put(Number160.createHash(admin)).setData(new Data(adminUser)).start().awaitUninterruptibly();
-    }
-
 
     public static Gossip getGossip() {
         return gossip;
     }
 
-    public void sendMessages(MessageType mType) throws IOException {
+    public void sendMessages(MessageType mType, int i) throws IOException {
 
-        Message msg = getGossip().getMessage(mType);
+        List<PeerAddress> listaPeers = peer1.getPeerBean().getPeerMap().getAll();
 
-        RequestP2PConfiguration requestP2PConfiguration = new RequestP2PConfiguration(1,10,0);
-        FutureDHT futureDHT = peer1.send(Number160.createHash(new Random().nextInt())).setObject(msg).setRequestP2PConfiguration(requestP2PConfiguration).start();
-        futureDHT.awaitUninterruptibly();
+        List<PeerAddress> arrayPeer = new ArrayList<PeerAddress>();
 
-        System.out.println("VALOR: " + Math.round(getGossip().calculateNumberNodes(mType)));
+        for(PeerAddress pa : listaPeers){
+            if (!(pa.getID().equals(new Number160(1)))){
+                arrayPeer.add(pa);
+            }
+        }
+
+        if (!arrayPeer.isEmpty()) {
+
+            int in = arrayPeer.size();
+            PeerAddress peerAddress = arrayPeer.get(new Random().nextInt(in));
+
+            if(u.getUsername().equals("admin") && i%50==0){
+
+                getGossip().resetGossip();
+                getGossip().incrementMesg();
+
+            }
+
+            if (getGossip().getNodesWeightValue()>0) {
+                Message msg = getGossip().getMessage(mType);
+                peer1.sendDirect(peerAddress).setObject(msg).start();
+            }
+
+        } else {
+
+            if(u.getUsername().equals("admin") && i%50==0){
+
+                getGossip().resetGossip();
+                getGossip().incrementMesg();
+
+            }
+
+            Message msg = getGossip().getMessage(mType);
+            peer1.sendDirect(peer1.getPeerAddress()).setObject(msg).start();
+        }
+
+    }
+
+    public void activeUser() {
+
+        String activeUser = u.getUsername();
+        String myKey = "activeUsers";
+        FutureDHT futureDHT;
+
+        try {
+            futureDHT = peer1.add(Number160.createHash(myKey)).setData(new Data(activeUser)).start();
+            futureDHT.awaitUninterruptibly();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void countUsers(int i) {
+
+        if (i%30==0) {
+
+            FutureDHT futureDHT;
+            futureDHT = peer1.get(Number160.createHash("activeUsers")).setAll().start();
+            futureDHT.awaitUninterruptibly();
+            Iterator<Data> iterator = futureDHT.getDataMap().values().iterator();
+            while (iterator.hasNext()) {
+                try {
+                    String userName = (String) iterator.next().getObject();
+
+                    if(!allUsers.contains(userName)){
+                        allUsers.add(userName);
+                    }
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            //System.out.println("ACTIVE USERS: " + userInDHT);
+
+        }
+
+    }
+
+    public static void setGossipValues(){
+
+        if(u.getUsername().equals("admin")){
+            getGossip().init(1,1);
+        }
+        else getGossip().init(1,0);
 
     }
 
@@ -325,10 +432,12 @@ public class tomp2p {
 
         Peer p = tomp2p.PeerBuilder(args[0]);
 
-        registerAdmin();
         passVerifier(p);
+        tom.activeUser();
+        setGossipValues();
         setupReplyHandler(p);
-        //new sendThread(tom).start();
+        new countUsers(tom).start();
+        new sendThread(tom).start();
         tomp2p.comandLine();
 
     }
@@ -345,7 +454,6 @@ public class tomp2p {
                     throws Exception
             {
 
-               // System.err.println("I'm "+p.getPeerID()+" and I just got the message ["+request+"] from "+sender.getID());
                 Message m = (Message)request;
                 getGossip().handleMsg(m);
                 return null;
@@ -358,6 +466,7 @@ public class tomp2p {
 
 class sendThread extends Thread {
     tomp2p sv;
+    int i = 0;
 
     public sendThread(tomp2p sv){
         this.sv = sv;
@@ -367,8 +476,9 @@ class sendThread extends Thread {
     public void run() {
         try{
             while (true){
-                Thread.sleep(100);
-                sv.sendMessages(MessageType.NODES_SUM);
+                Thread.sleep(150);
+                sv.sendMessages(MessageType.NODES_SUM, i);
+                i++;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -377,6 +487,30 @@ class sendThread extends Thread {
         }
     }
 
+}
+
+class countUsers extends Thread {
+
+    tomp2p sv;
+    int i=0;
+
+    public countUsers(tomp2p sv){
+        this.sv = sv;
+    }
+
+    @Override
+    public void run(){
+
+        try{
+            while(true){
+                Thread.sleep(150);
+                sv.countUsers(i);
+                i++;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 

@@ -43,6 +43,10 @@ public class Gossip {
         }
     }
 
+    public double getNodesWeightValue() {
+        return nodesWeightValue;
+    }
+
     public void incrementMesg(){
         this.id = this.id + 1;
     }
@@ -53,27 +57,23 @@ public class Gossip {
 
             this.nodesSumValue = this.nodesSumValue + msg.getValue();
             this.nodesWeightValue = this.nodesWeightValue + msg.getWeight();
-        }
 
+        }
     }
 
     public synchronized Message getMessage(MessageType messageType) throws IOException{
 
         Message msg = null;
 
-/*        System.out.println("RECEBEU");
-        System.out.println("SOMA: " + this.nodesSumValue);
-        System.out.println("PESO: " + this.nodesWeightValue);
-        System.out.println("VAI MANDAR");
-        System.out.println("SOMA: " + this.nodesSumValue/2);
-        System.out.println("PESO: " + this.nodesWeightValue/2);*/
-
         if(messageType.toString().equals("NODES_SUM")){
 
             msg = new Message(messageType, this.nodesSumValue/2, this.nodesWeightValue/2, this.id);
             this.nodesSumValue = this.nodesSumValue/2;
             this.nodesWeightValue = this.nodesWeightValue/2;
+
         }
+
+        //System.out.println("PESO: " + this.nodesWeightValue);
 
         return msg;
     }
