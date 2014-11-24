@@ -329,7 +329,7 @@ public class tomp2p {
             int in = arrayPeer.size();
             PeerAddress peerAddress = arrayPeer.get(new Random().nextInt(in));
 
-            if(u.getUsername().equals("admin") && i%30==0){
+            if(u.getUsername().equals("admin") && i%50==0){
 
                 getGossip().resetGossip();
                 getGossip().incrementMesg();
@@ -343,8 +343,15 @@ public class tomp2p {
 
         } else {
 
+            if(u.getUsername().equals("admin") && i%50==0){
+
+                getGossip().resetGossip();
+                getGossip().incrementMesg();
+
+            }
+
             Message msg = getGossip().getMessage(mType);
-            peer1.sendDirect(peer1.getPeerAddress()).setObject(msg).start();;
+            peer1.sendDirect(peer1.getPeerAddress()).setObject(msg).start();
         }
 
     }
