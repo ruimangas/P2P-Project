@@ -101,8 +101,6 @@ public class tomp2p {
             while (true) {
 
 
-                System.out.println(peer1.getPeerBean().getPeerMap().getAll().size());
-
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
                 System.out.println("2 - search for an item to buy");
@@ -134,7 +132,6 @@ public class tomp2p {
                         userManagement();
                         break;
                     case 0:
-                        peer1.remove(Number160.createHash("activeUsers"));
                         peer1.shutdown();
                         return;
                     default:
@@ -213,10 +210,6 @@ public class tomp2p {
     }
 
     public static void acceptBid() {
-
-        for(String ola : allUsers){
-            System.out.println("LISTA: " + ola);
-        }
 
         System.out.println("not yet done");
     }
@@ -313,6 +306,7 @@ public class tomp2p {
     public static Gossip getGossip() {
         return gossip;
     }
+
 
     public void sendMessages(MessageType mType, int i) throws IOException {
 
