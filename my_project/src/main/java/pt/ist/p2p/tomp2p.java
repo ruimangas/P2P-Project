@@ -57,7 +57,7 @@ public class tomp2p {
 
         Bindings b = new Bindings();
 
-        peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).makeAndListen();
+        peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
 
         InetAddress address = Inet4Address.getByName(getMyIp());
 
