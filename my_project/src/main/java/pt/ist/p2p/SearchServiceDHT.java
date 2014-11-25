@@ -35,6 +35,7 @@ public class SearchServiceDHT {
        FutureDHT futureGet = peer.get(keyKeyword).setAll().start();
        futureGet.awaitUninterruptibly();
        List<Number160> myReferences = new ArrayList<Number160>();
+       List<Number160> myReferencesDev = new ArrayList<Number160>();
        Object o;
        
        if(futureGet.isSuccess()){
@@ -49,15 +50,26 @@ public class SearchServiceDHT {
                         myHash = (Number160)o;
                         myReferences.add(myHash);
                        
+                       
                 } else {
+                                        
                     myReferences.add(keyKeyword);
+                 
                 }
              counterRef++;
              
          }
        }
      
-      return myReferences;
+       for(Number160 n : myReferences){
+          if( myReferencesDev.contains(n))
+              continue;
+          else
+              myReferencesDev.add(n);
+          
+       }   
+       
+      return myReferencesDev;
    }
    
    public static List<ItemSimple> search(Peer myPeer, List<Number160> references) throws ClassNotFoundException, IOException{ 
@@ -67,7 +79,7 @@ public class SearchServiceDHT {
        search = references;
        
        List<ItemSimple> items = new ArrayList<ItemSimple>();
-    
+       Object o;
       
         for(Number160 number: search){
             
@@ -76,9 +88,13 @@ public class SearchServiceDHT {
             if(futureGet.isSuccess()){         
                
                Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
-               
+              
                while(counterItem < futureGet.getDataMap().size()){
-                   items.add((ItemSimple)iteratorItem.next().getObject());
+                 
+                   o = iteratorItem.next().getObject();
+                   
+                   if(!(o.getClass().equals(number.getClass())))
+                      items.add((ItemSimple)o);
                    
                    counterItem++;
                }
