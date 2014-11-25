@@ -109,7 +109,7 @@ public class tomp2p {
                 System.out.println("4 - accept a bid");
                 System.out.println("5 - view item details");
                 System.out.println("6 - purchase and bidding history");
-                System.out.println("7 - user management");
+                if(u.getUsername().equals("admin")) System.out.println("7 - user management");
                 System.out.println("0 - exit app");
 
                 int numero = keyboard.nextInt();
@@ -119,6 +119,9 @@ public class tomp2p {
                         break;
                     case 2:
                         searchItem();
+                        break;
+                    case 3:
+                        bidOnItem();
                         break;
                     case 4:
                         acceptBid();
@@ -151,7 +154,6 @@ public class tomp2p {
         ItemSimple item = new ItemSimple();
         Scanner keyboard1 = new Scanner(System.in);
 
-
         System.out.println("Please, enter the name of the product:");
         String itemTitle = keyboard1.nextLine();
 
@@ -161,11 +163,15 @@ public class tomp2p {
         item.setName(itemTitle.toLowerCase());
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
-
+        u.setOfferedItem(itemTitle);
 
         OfferItemServiceDHT.putDatItem(peer1, item);
 
 
+    }
+
+    public double getActualNumberFiles(){
+        return u.getOfferedItems().size();
     }
 
     public static void searchItem() throws IOException, ClassNotFoundException {
@@ -243,12 +249,11 @@ public class tomp2p {
         if(u.getUsername().equals("admin")){
 
             System.out.println("There are " + Math.round(getGossip().calculateNumberNodes(MessageType.NODES_SUM)) + " nodes.");
+            System.out.println("There are " + Math.round(getGossip().calculateNumberItems(MessageType.ITEMS_SUM))  + " files.");
             System.out.println("There are " + allUsers.size() + " users.");
         }
 
-        else System.out.println("Please, log in as admin.");
-
-
+        else System.out.println("Invalid operation");
     }
 
 
@@ -341,12 +346,13 @@ public class tomp2p {
 
             if(u.getUsername().equals("admin") && i%50==0){
 
-                getGossip().resetGossip();
+                getGossip().resetGossipNodes();
+                getGossip().resetGossipFiles();
                 getGossip().incrementMesg();
 
             }
 
-            if (getGossip().getNodesWeightValue()>0) {
+            if (getGossip().getNodesWeightValue()>0 && getGossip().getNumItemsWeight()>0) {
                 Message msg = getGossip().getMessage(mType);
                 peer1.sendDirect(peerAddress).setObject(msg).start();
             }
@@ -355,7 +361,8 @@ public class tomp2p {
 
             if(u.getUsername().equals("admin") && i%50==0){
 
-                getGossip().resetGossip();
+                getGossip().resetGossipNodes();
+                getGossip().resetGossipFiles();
                 getGossip().incrementMesg();
 
             }
@@ -401,22 +408,20 @@ public class tomp2p {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
-
-            //System.out.println("ACTIVE USERS: " + userInDHT);
-
         }
-
     }
 
     public static void setGossipValues(){
 
         if(u.getUsername().equals("admin")){
             getGossip().init(1,1);
+            getGossip().initFiles(new tomp2p().getActualNumberFiles(), 1);
         }
-        else getGossip().init(1,0);
-
+        else{
+            getGossip().init(1,0);
+            getGossip().initFiles(new tomp2p().getActualNumberFiles(), 0);
+        }
     }
 
 
@@ -472,6 +477,7 @@ class sendThread extends Thread {
             while (true){
                 Thread.sleep(150);
                 sv.sendMessages(MessageType.NODES_SUM, i);
+                sv.sendMessages(MessageType.ITEMS_SUM, i);
                 i++;
             }
         } catch (InterruptedException e) {
@@ -480,7 +486,6 @@ class sendThread extends Thread {
             e.printStackTrace();
         }
     }
-
 }
 
 class countUsers extends Thread {
