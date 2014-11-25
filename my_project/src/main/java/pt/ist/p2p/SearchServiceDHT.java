@@ -52,7 +52,7 @@ public class SearchServiceDHT {
                        
                        
                 } else {
-                    
+                                        
                     myReferences.add(keyKeyword);
                  
                 }
@@ -66,6 +66,7 @@ public class SearchServiceDHT {
               continue;
           else
               myReferencesDev.add(n);
+          
        }   
        
       return myReferencesDev;
@@ -78,7 +79,7 @@ public class SearchServiceDHT {
        search = references;
        
        List<ItemSimple> items = new ArrayList<ItemSimple>();
-    
+       Object o;
       
         for(Number160 number: search){
             
@@ -89,7 +90,11 @@ public class SearchServiceDHT {
                Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
               
                while(counterItem < futureGet.getDataMap().size()){
-                   items.add((ItemSimple)iteratorItem.next().getObject());
+                 
+                   o = iteratorItem.next().getObject();
+                   
+                   if(!(o.getClass().equals(number.getClass())))
+                      items.add((ItemSimple)o);
                    
                    counterItem++;
                }
