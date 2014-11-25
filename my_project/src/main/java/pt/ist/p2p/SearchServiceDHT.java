@@ -35,16 +35,23 @@ public class SearchServiceDHT {
        FutureDHT futureGet = peer.get(keyKeyword).setAll().start();
        futureGet.awaitUninterruptibly();
        List<Number160> myReferences = new ArrayList<Number160>();
-      
+       Object o;
+       
        if(futureGet.isSuccess()){
         
          Iterator<Data> iteratorRef =  futureGet.getDataMap().values().iterator();
         
          while(counterRef < futureGet.getDataMap().size()){
-             
-             myHash = (Number160)iteratorRef.next().getObject();
-             myReferences.add(myHash);
-             
+                  o = iteratorRef.next().getObject();
+                
+                  if(o.getClass().equals(keyKeyword.getClass())){
+                    
+                        myHash = (Number160)o;
+                        myReferences.add(myHash);
+                       
+                } else {
+                    myReferences.add(keyKeyword);
+                }
              counterRef++;
              
          }
@@ -72,6 +79,7 @@ public class SearchServiceDHT {
                
                while(counterItem < futureGet.getDataMap().size()){
                    items.add((ItemSimple)iteratorItem.next().getObject());
+                   
                    counterItem++;
                }
               counterItem = 0;
@@ -105,13 +113,17 @@ public class SearchServiceDHT {
             for(int i=numOperators -1;i>=0;i--){
           
                  myOperator = myOperators.get(i);
-                 theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
-               
+                 
+                 if(numOperands > 1)
+                    theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
+                 else
+                     System.out.println("Not enough arguments - Exception");
+                 
                  
               } 
              
             if(myCandidates.isEmpty())
-                System.out.println("Throw Exception!!!!!!!!");
+                System.out.println("No results found - Exception");
                
            theOnes = search(myPeer,myCandidates);   
            
@@ -120,7 +132,7 @@ public class SearchServiceDHT {
      }
         
     
-    public static void theChosenOnes(String myOperator, List<Number160> secondSearch ){
+    public static void theChosenOnes(String myOperator, List<Number160> secondSearch){
         
         
         if(myOperator.equals("and")){
@@ -138,6 +150,16 @@ public class SearchServiceDHT {
                     
                 }
             }
+        
+        if(myOperator.equals("not")){
+            for(Number160 hash : secondSearch){
+                
+                if(myCandidates.contains(hash))
+                    myCandidates.remove(hash);
+                
+            }
+            
+        }
       }
     
    public static void clearMySearch(){
