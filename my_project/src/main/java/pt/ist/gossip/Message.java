@@ -1,4 +1,4 @@
-package main.java.pt.ist.gossip.messages;
+package main.java.pt.ist.gossip;
 
 import java.io.Serializable;
 
