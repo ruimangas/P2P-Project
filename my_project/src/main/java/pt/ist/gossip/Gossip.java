@@ -106,9 +106,6 @@ public class Gossip {
             this.numItemsWeight = this.numItemsWeight/2;
         }
 
-        //System.out.println("PESO_NODES: " + this.nodesWeightValue);
-        //System.out.println("PESO_FILES: " + this.numItemsWeight);
-
         return msg;
     }
 

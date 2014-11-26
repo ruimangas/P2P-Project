@@ -16,6 +16,7 @@ import net.tomp2p.futures.FutureDiscover;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
 import net.tomp2p.peers.Number160;
+import net.tomp2p.peers.Number480;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
@@ -34,10 +35,7 @@ public class tomp2p {
 
     private static Gossip gossip = new Gossip();
 
-    private static ArrayList<String> allUsers = new ArrayList<String>();
-
     public tomp2p() {
-
 
     }
 
@@ -47,7 +45,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName("193.136.167.68");
+        InetAddress address = Inet4Address.getByName("194.210.222.32");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -83,7 +81,6 @@ public class tomp2p {
     public static void comandLine() {
 
         Scanner keyboard = new Scanner(System.in);
-
 
         try {
 
@@ -136,6 +133,29 @@ public class tomp2p {
         }
     }
 
+    public static int allReplicated(String className) throws IOException, ClassNotFoundException {
+
+        int activeStuff = 0;
+
+        Map<Number480, Data> map = peer1.getPeerBean().getStorage().map();
+        for (Object o : map.entrySet()) {
+            Map.Entry thisEntry = (Map.Entry) o;
+            Object value = thisEntry.getValue();
+            Data data = (Data) value;
+
+            try {
+                if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p."+className)) {
+                    activeStuff++;
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return activeStuff;
+    }
 
     public static void offerItem() throws IOException, ClassNotFoundException {
 
@@ -260,8 +280,8 @@ public class tomp2p {
         if(u.getUsername().equals("admin")){
 
             System.out.println("There are " + Math.round(getGossip().calculateNumberNodes(MessageType.NODES_SUM)) + " nodes.");
-            System.out.println("There are " + Math.round(getGossip().calculateNumberItems(MessageType.ITEMS_SUM))  + " files.");
-            System.out.println("There are " + allUsers.size() + " users.");
+            System.out.println("There are " + Math.round(getGossip().calculateNumberItems(MessageType.ITEMS_SUM))  + " items.");
+
         }
 
         else System.out.println("Invalid operation");
@@ -384,45 +404,6 @@ public class tomp2p {
 
     }
 
-    public void activeUser() {
-
-        String activeUser = u.getUsername();
-        String myKey = "activeUsers";
-        FutureDHT futureDHT;
-
-        try {
-            futureDHT = peer1.add(Number160.createHash(myKey)).setData(new Data(activeUser)).start();
-            futureDHT.awaitUninterruptibly();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void countUsers(int i) {
-
-        if (i%30==0) {
-
-            FutureDHT futureDHT;
-            futureDHT = peer1.get(Number160.createHash("activeUsers")).setAll().start();
-            futureDHT.awaitUninterruptibly();
-            Iterator<Data> iterator = futureDHT.getDataMap().values().iterator();
-            while (iterator.hasNext()) {
-                try {
-                    String userName = (String) iterator.next().getObject();
-
-                    if(!allUsers.contains(userName)){
-                        allUsers.add(userName);
-                    }
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     public static void setGossipValues(){
 
         if(u.getUsername().equals("admin")){
@@ -443,15 +424,12 @@ public class tomp2p {
         Peer p = tomp2p.PeerBuilder(args[0]);
 
         passVerifier(p);
-        tom.activeUser();
         setGossipValues();
         setupReplyHandler(p);
-        new countUsers(tom).start();
         new sendThread(tom).start();
         tomp2p.comandLine();
 
     }
-
 
     private static void setupReplyHandler(Peer peer1)
     {
@@ -500,29 +478,6 @@ class sendThread extends Thread {
     }
 }
 
-class countUsers extends Thread {
-    final int ONE_SECOND = 1000;
-    tomp2p sv;
-    int i=0;
-
-    public countUsers(tomp2p sv){
-        this.sv = sv;
-    }
-
-    @Override
-    public void run(){
-
-        try{
-            while(true){
-                Thread.sleep(ONE_SECOND);
-                sv.countUsers(i);
-                i++;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-}
 
 
 
