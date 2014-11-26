@@ -1,5 +1,8 @@
+planetlab1.cs.uoi.gr
+planetlab1.cs.vu.nl
 planetlab1.csg.uzh.ch
 planetlab1.di.fct.unl.pt
+planetlab1.di.unito.it
 planetlab1.dit.upm.es
 planetlab1.eecs.jacobs-university.de
 planetlab1.eurecom.fr
@@ -14,6 +17,7 @@ planetlab2.cs.aueb.gr
 planetlab2.cs.uit.no
 planetlab2.eurecom.fr
 planetlab2.extern.kuleuven.be
+dplanet2.uoc.edu
 plab4.ple.silweb.pl
 planck227ple.test.ibbt.be
 planet-lab-node1.netgroup.uniroma2.it
@@ -33,8 +37,6 @@ planetlab01.dis.unina.it
 planetlab01.tkn.tu-berlin.de
 planetlab1.ci.pwr.wroc.pl
 planetlab1.cs.uit.no
-planetlab1.cs.uoi.gr
-planetlab1.cs.vu.nl
 gschembra3.diit.unict.it
 openlab01.pl.sophia.inria.fr
 ops.ii.uam.es
@@ -64,6 +66,7 @@ host2.planetlab.informatik.tu-darmstadt.de
 planetlab1.imp.fu-berlin.de
 planetlab1.informatik.uni-goettingen.de
 planetlab1.jcp-consult.net
+planetlab1.mini.pw.edu.pl
 planetlab1.montefiore.ulg.ac.be
 planetlab1.mta.ac.il
 planetlab1.net.in.tum.de
@@ -82,6 +85,7 @@ planetlab1.unineuchatel.ch
 planetlab1.upc.es
 planetlab1.upm.ro
 planetlab1.urv.cat
+host3-plb.loria.fr
 iason.inf.uth.gr
 inriarennes1.irisa.fr
 inriarennes2.irisa.fr
@@ -93,6 +97,7 @@ mars.planetlab.haw-hamburg.de
 medea.inf.uth.gr
 merkur.planetlab.haw-hamburg.de
 node2pl.planet-lab.telecom-lille1.eu
+onelab-1.fhi-fokus.de
 onelab1.info.ucl.ac.be
 onelab10.pl.sophia.inria.fr
 onelab2.warsaw.rd.tp.pl
@@ -113,7 +118,6 @@ planetlab2.polito.it
 planetlab2.rd.tut.fi
 planetlab2.s3.kth.se
 planetlab2.science.unitn.it
-planetlab3.net.in.tum.de
 planetlab4.cs.st-andrews.ac.uk
 planetlab4.cslab.ece.ntua.gr
 planetlab4.hiit.fi
@@ -126,6 +130,7 @@ pl1.tailab.eu
 pl1.uni-rostock.de
 pl2.bell-labs.fr
 pl2.ccsrfi.net
+pl2.tailab.eu
 planet1.inf.tu-dresden.de
 planet1.l3s.uni-hannover.de
 planet1.servers.ua.pt
@@ -202,8 +207,9 @@ planetlab2lannion.elibel.tm.fr
 planetlab3.cs.st-andrews.ac.uk
 planetlab3.cslab.ece.ntua.gr
 planetlab3.hiit.fi
-planetlab3.informatik.uni-erlangen.de
 planetlab3.upc.es
+planetlab3.xeno.cl.cam.ac.uk
 stella.planetlab.ntua.gr
 sybaris.ipv6.lip6.fr
+utet.ii.uam.es
 vicky.planetlab.ntua.gr
