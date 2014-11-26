@@ -6,32 +6,20 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.*;
-import java.io.*;
-import java.util.concurrent.Future;
 
+import main.java.pt.ist.gossip.Message;
+import main.java.pt.ist.gossip.MessageType;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureBootstrap;
 import net.tomp2p.futures.FutureDiscover;
-import net.tomp2p.futures.FutureCreate;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
-import net.tomp2p.p2p.RequestP2PConfiguration;
-import net.tomp2p.p2p.builder.PutBuilder;
-import net.tomp2p.p2p.builder.RemoveBuilder;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
-import net.tomp2p.replication.Replication;
-import net.tomp2p.rpc.DirectDataRPC;
 import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
-import main.java.pt.ist.gossip.core.Gossip;
-import main.java.pt.ist.gossip.messages.*;
-import main.java.pt.ist.p2p.masterPeer;
-
-
-import static main.java.pt.ist.p2p.tomp2p.getGossip;
-
+import main.java.pt.ist.gossip.Gossip;
 
 
 public class tomp2p {
@@ -59,7 +47,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName("194.210.221.10");
+        InetAddress address = Inet4Address.getByName("193.136.167.68");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
