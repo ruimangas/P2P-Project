@@ -59,7 +59,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName(getMyIp());
+        InetAddress address = Inet4Address.getByName("194.210.221.10");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -102,8 +102,6 @@ public class tomp2p {
             while (true) {
 
 
-                System.out.println(peer1.getPeerBean().getPeerMap().getAll().size());
-
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
                 System.out.println("2 - search for an item to buy");
@@ -111,7 +109,7 @@ public class tomp2p {
                 System.out.println("4 - accept a bid");
                 System.out.println("5 - view item details");
                 System.out.println("6 - purchase and bidding history");
-                System.out.println("7 - user management");
+                if(u.getUsername().equals("admin")) System.out.println("7 - user management");
                 System.out.println("0 - exit app");
 
                 int numero = keyboard.nextInt();
@@ -121,6 +119,9 @@ public class tomp2p {
                         break;
                     case 2:
                         searchItem();
+                        break;
+                    case 3:
+                        bidOnItem();
                         break;
                     case 4:
                         acceptBid();
@@ -135,7 +136,6 @@ public class tomp2p {
                         userManagement();
                         break;
                     case 0:
-                        peer1.remove(Number160.createHash("activeUsers"));
                         peer1.shutdown();
                         return;
                     default:
@@ -154,7 +154,6 @@ public class tomp2p {
         ItemSimple item = new ItemSimple();
         Scanner keyboard1 = new Scanner(System.in);
 
-
         System.out.println("Please, enter the name of the product:");
         String itemTitle = keyboard1.nextLine();
 
@@ -164,11 +163,15 @@ public class tomp2p {
         item.setName(itemTitle.toLowerCase());
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
-
+        u.setOfferedItem(itemTitle);
 
         OfferItemServiceDHT.putDatItem(peer1, item);
 
 
+    }
+
+    public double getActualNumberFiles(){
+        return u.getOfferedItems().size();
     }
 
     public static void searchItem() throws IOException, ClassNotFoundException {
@@ -229,10 +232,6 @@ public class tomp2p {
 
     public static void acceptBid() {
 
-        for(String ola : allUsers){
-            System.out.println("LISTA: " + ola);
-        }
-
         System.out.println("not yet done");
     }
 
@@ -273,12 +272,11 @@ public class tomp2p {
         if(u.getUsername().equals("admin")){
 
             System.out.println("There are " + Math.round(getGossip().calculateNumberNodes(MessageType.NODES_SUM)) + " nodes.");
+            System.out.println("There are " + Math.round(getGossip().calculateNumberItems(MessageType.ITEMS_SUM))  + " files.");
             System.out.println("There are " + allUsers.size() + " users.");
         }
 
-        else System.out.println("Please, log in as admin.");
-
-
+        else System.out.println("Invalid operation");
     }
 
 
@@ -351,6 +349,7 @@ public class tomp2p {
         return gossip;
     }
 
+
     public void sendMessages(MessageType mType, int i) throws IOException {
 
         List<PeerAddress> listaPeers = peer1.getPeerBean().getPeerMap().getAll();
@@ -370,12 +369,13 @@ public class tomp2p {
 
             if(u.getUsername().equals("admin") && i%50==0){
 
-                getGossip().resetGossip();
+                getGossip().resetGossipNodes();
+                getGossip().resetGossipFiles();
                 getGossip().incrementMesg();
 
             }
 
-            if (getGossip().getNodesWeightValue()>0) {
+            if (getGossip().getNodesWeightValue()>0 && getGossip().getNumItemsWeight()>0) {
                 Message msg = getGossip().getMessage(mType);
                 peer1.sendDirect(peerAddress).setObject(msg).start();
             }
@@ -384,7 +384,8 @@ public class tomp2p {
 
             if(u.getUsername().equals("admin") && i%50==0){
 
-                getGossip().resetGossip();
+                getGossip().resetGossipNodes();
+                getGossip().resetGossipFiles();
                 getGossip().incrementMesg();
 
             }
@@ -430,22 +431,20 @@ public class tomp2p {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
-
-            //System.out.println("ACTIVE USERS: " + userInDHT);
-
         }
-
     }
 
     public static void setGossipValues(){
 
         if(u.getUsername().equals("admin")){
             getGossip().init(1,1);
+            getGossip().initFiles(new tomp2p().getActualNumberFiles(), 1);
         }
-        else getGossip().init(1,0);
-
+        else{
+            getGossip().init(1,0);
+            getGossip().initFiles(new tomp2p().getActualNumberFiles(), 0);
+        }
     }
 
 
@@ -488,6 +487,7 @@ public class tomp2p {
 }
 
 class sendThread extends Thread {
+    final int ONE_SECOND = 1000;
     tomp2p sv;
     int i = 0;
 
@@ -499,8 +499,9 @@ class sendThread extends Thread {
     public void run() {
         try{
             while (true){
-                Thread.sleep(150);
+                Thread.sleep(ONE_SECOND);
                 sv.sendMessages(MessageType.NODES_SUM, i);
+                sv.sendMessages(MessageType.ITEMS_SUM, i);
                 i++;
             }
         } catch (InterruptedException e) {
@@ -509,11 +510,10 @@ class sendThread extends Thread {
             e.printStackTrace();
         }
     }
-
 }
 
 class countUsers extends Thread {
-
+    final int ONE_SECOND = 1000;
     tomp2p sv;
     int i=0;
 
@@ -526,7 +526,7 @@ class countUsers extends Thread {
 
         try{
             while(true){
-                Thread.sleep(150);
+                Thread.sleep(ONE_SECOND);
                 sv.countUsers(i);
                 i++;
             }

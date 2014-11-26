@@ -40,7 +40,7 @@ public class SearchServiceDHT {
        
        if(futureGet.isSuccess()){
         
-         Iterator<Data> iteratorRef =  futureGet.getDataMap().values().iterator();
+         Iterator<Data> iteratorRef = futureGet.getDataMap().values().iterator();
         
          while(counterRef < futureGet.getDataMap().size()){
                   o = iteratorRef.next().getObject();

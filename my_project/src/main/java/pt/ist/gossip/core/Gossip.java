@@ -1,6 +1,8 @@
 package main.java.pt.ist.gossip.core;
 
 import main.java.pt.ist.gossip.messages.*;
+import main.java.pt.ist.p2p.tomp2p;
+
 import java.net.Socket;
 import java.io.*;
 
@@ -10,6 +12,12 @@ public class Gossip {
     private double nodesWeightValue;
     private double initialWeightValue;
     private double initialSumValue;
+
+    private double numItemsSum;
+    private double numItemsWeight;
+
+    private double initialItemsWeight;
+
     private double id = 0;
 
 
@@ -27,6 +35,15 @@ public class Gossip {
 
     }
 
+    public void initFiles(double numItemsSum, double numItemsWeight){
+
+        this.numItemsSum = numItemsSum;
+        this.numItemsWeight = numItemsWeight;
+
+        this.initialItemsWeight = numItemsWeight;
+
+    }
+
     public void incrementMessage(){
         this.id = this.id + 1;
     }
@@ -38,13 +55,18 @@ public class Gossip {
         }
         else if (msg.getId() > this.id){
             this.id = msg.getId();
-            resetGossip();
+            resetGossipNodes();
+            resetGossipFiles();
             process(msg);
         }
     }
 
     public double getNodesWeightValue() {
         return nodesWeightValue;
+    }
+
+    public double getNumItemsWeight() {
+        return numItemsWeight;
     }
 
     public void incrementMesg(){
@@ -58,6 +80,12 @@ public class Gossip {
             this.nodesSumValue = this.nodesSumValue + msg.getValue();
             this.nodesWeightValue = this.nodesWeightValue + msg.getWeight();
 
+        }
+
+        if(msg.getmType().toString().equals("ITEMS_SUM")){
+
+            this.numItemsSum = this.numItemsSum + msg.getValue();
+            this.numItemsWeight = this.numItemsWeight + msg.getWeight();
         }
     }
 
@@ -73,7 +101,15 @@ public class Gossip {
 
         }
 
-        //System.out.println("PESO: " + this.nodesWeightValue);
+        if(messageType.toString().equals("ITEMS_SUM")){
+
+            msg = new Message(messageType, this.numItemsSum/2, this.numItemsWeight/2, this.id);
+            this.numItemsSum = this.numItemsSum/2;
+            this.numItemsWeight = this.numItemsWeight/2;
+        }
+
+        //System.out.println("PESO_NODES: " + this.nodesWeightValue);
+        //System.out.println("PESO_FILES: " + this.numItemsWeight);
 
         return msg;
     }
@@ -88,11 +124,27 @@ public class Gossip {
         return 0;
     }
 
-    public void resetGossip(){
+    public double calculateNumberItems(MessageType messageType){
+
+        if(messageType.toString().equals("ITEMS_SUM")){
+
+            return this.numItemsSum/this.numItemsWeight;
+
+        }
+        return 0;
+    }
+
+    public void resetGossipNodes(){
 
         this.nodesWeightValue = this.initialWeightValue;
         this.nodesSumValue = this.initialSumValue;
 
+    }
+
+    public void resetGossipFiles(){
+
+        this.numItemsSum = new tomp2p().getActualNumberFiles();
+        this.numItemsWeight = this.initialItemsWeight;
     }
 
 }
