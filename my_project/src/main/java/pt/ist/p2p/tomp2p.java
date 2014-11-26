@@ -59,7 +59,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
 
-        InetAddress address = Inet4Address.getByName(getMyIp());
+        InetAddress address = Inet4Address.getByName("194.210.221.10");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -464,6 +464,7 @@ public class tomp2p {
 }
 
 class sendThread extends Thread {
+    final int ONE_SECOND = 1000;
     tomp2p sv;
     int i = 0;
 
@@ -475,7 +476,7 @@ class sendThread extends Thread {
     public void run() {
         try{
             while (true){
-                Thread.sleep(150);
+                Thread.sleep(ONE_SECOND);
                 sv.sendMessages(MessageType.NODES_SUM, i);
                 sv.sendMessages(MessageType.ITEMS_SUM, i);
                 i++;
@@ -489,7 +490,7 @@ class sendThread extends Thread {
 }
 
 class countUsers extends Thread {
-
+    final int ONE_SECOND = 1000;
     tomp2p sv;
     int i=0;
 
@@ -502,7 +503,7 @@ class countUsers extends Thread {
 
         try{
             while(true){
-                Thread.sleep(150);
+                Thread.sleep(ONE_SECOND);
                 sv.countUsers(i);
                 i++;
             }
