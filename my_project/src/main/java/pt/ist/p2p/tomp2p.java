@@ -174,6 +174,7 @@ public class tomp2p {
         List<String> myOperands = new ArrayList<String>();
         List<Number160> hashSimple;
 
+        
         for (String st : choice) {
             if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
                 myOperators.add(st.toLowerCase());
@@ -223,9 +224,31 @@ public class tomp2p {
     }
 
     public static void itemDetails() {
-
-
-        System.out.println("not yet done");
+        
+        String itemName;
+        String dealer;
+        Scanner keyboard1 = new Scanner(System.in);
+        
+        System.out.println("Item name:");
+        
+        itemName = keyboard1.nextLine();
+        
+        System.out.println("Dealer:");
+        dealer = keyboard1.nextLine();
+        
+        
+       try {
+        
+           SeeItemsDetailsServiceDHT.seeItemsDetails(peer1, itemName, dealer);
+    
+       } catch (ClassNotFoundException e) {
+        
+          e.printStackTrace();
+       } catch (IOException e) {
+        
+          e.printStackTrace();
+       }
+        
     }
 
     public static void history() {
