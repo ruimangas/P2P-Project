@@ -21,6 +21,7 @@ import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.Gossip;
+import net.tomp2p.replication.Replication;
 
 
 public class tomp2p {
@@ -35,9 +36,11 @@ public class tomp2p {
 
     private static Gossip gossip = new Gossip();
 
+
     public tomp2p() {
 
     }
+
 
     public static Peer PeerBuilder(String port) throws ClassNotFoundException, IOException {
 
@@ -64,19 +67,7 @@ public class tomp2p {
         return peer1;
     }
 
-    public static String getMyIp() {
 
-        String ip = null;
-
-        try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        } catch (java.net.UnknownHostException e) {
-            System.out.println("error: ip not found");
-            e.printStackTrace();
-        }
-
-        return ip;
-    }
 
     public static void comandLine() {
 
@@ -133,7 +124,8 @@ public class tomp2p {
         }
     }
 
-    public static int allReplicated(String className) throws IOException, ClassNotFoundException {
+
+    public int allReplicated(String className) throws IOException, ClassNotFoundException {
 
         int activeStuff = 0;
 
@@ -175,7 +167,6 @@ public class tomp2p {
 
         OfferItemServiceDHT.putDatItem(peer1, item);
 
-
     }
 
     public double getActualNumberFiles(){
@@ -200,17 +191,12 @@ public class tomp2p {
                 myOperators.add(st.toLowerCase());
             else
                 myOperands.add(st);
-
-
         }
 
         try {  
             
             if(myOperators.size() == 0){
-            
-                hashSimple = new ArrayList<Number160>();
-                
-     
+
                 hashSimple = SearchServiceDHT.findReference(peer1, myOperands.get(0));
                 
                 items = SearchServiceDHT.search(peer1,hashSimple);
@@ -358,7 +344,7 @@ public class tomp2p {
     }
 
 
-    public void sendMessages(MessageType mType, int i) throws IOException {
+    public void sendMessages(MessageType mType, int i) throws IOException, ClassNotFoundException {
 
         List<PeerAddress> listaPeers = peer1.getPeerBean().getPeerMap().getAll();
 
@@ -404,15 +390,15 @@ public class tomp2p {
 
     }
 
-    public static void setGossipValues(){
+    public static void setGossipValues() throws IOException, ClassNotFoundException {
 
         if(u.getUsername().equals("admin")){
             getGossip().init(1,1);
-            getGossip().initFiles(new tomp2p().getActualNumberFiles(), 1);
+            getGossip().initFiles(1, 1);
         }
         else{
             getGossip().init(1,0);
-            getGossip().initFiles(new tomp2p().getActualNumberFiles(), 0);
+            getGossip().initFiles(0, 0);
         }
     }
 
@@ -427,6 +413,7 @@ public class tomp2p {
         setGossipValues();
         setupReplyHandler(p);
         new sendThread(tom).start();
+        new checkThread(tom).start();
         tomp2p.comandLine();
 
     }
@@ -474,9 +461,42 @@ class sendThread extends Thread {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }
+
+class checkThread extends Thread {
+    final int FIVE_SECOND = 5000;
+    tomp2p sv;
+    int i = 0;
+
+    public checkThread(tomp2p sv){
+        this.sv = sv;
+    }
+
+    @Override
+    public void run() {
+        try{
+            while (true){
+                Thread.sleep(FIVE_SECOND);
+                int number = sv.allReplicated("ItemSimple");
+                System.out.println(number);
+                i++;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
 
 
 

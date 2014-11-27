@@ -85,6 +85,7 @@ public class Gossip {
             this.numItemsSum = this.numItemsSum + msg.getValue();
             this.numItemsWeight = this.numItemsWeight + msg.getWeight();
         }
+
     }
 
     public synchronized Message getMessage(MessageType messageType) throws IOException{
@@ -106,6 +107,9 @@ public class Gossip {
             this.numItemsWeight = this.numItemsWeight/2;
         }
 
+        //System.out.println("PESO_NODES: " + this.nodesWeightValue);
+        //System.out.println("PESO_FILES: " + this.numItemsWeight);
+
         return msg;
     }
 
@@ -123,7 +127,7 @@ public class Gossip {
 
         if(messageType.toString().equals("ITEMS_SUM")){
 
-            return this.numItemsSum/this.numItemsWeight;
+            return (this.numItemsSum/this.numItemsWeight)/4;
 
         }
         return 0;

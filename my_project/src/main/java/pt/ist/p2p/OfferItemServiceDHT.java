@@ -21,12 +21,14 @@ import net.tomp2p.replication.Replication;
 import net.tomp2p.rpc.DirectDataRPC;
 import net.tomp2p.storage.Data;
 
+
 public class OfferItemServiceDHT {
 
     
     public static void putDatItem(Peer myPeer,ItemSimple item) throws IOException{
         
-        final String myTitle = item.getName();
+       final String myTitle = item.getName();
+
 
         Number160 searchKey = Number160.createHash(myTitle);
         System.out.println(searchKey);
@@ -43,5 +45,9 @@ public class OfferItemServiceDHT {
                 
             }
         }
+
     }
+
+
+
 }
