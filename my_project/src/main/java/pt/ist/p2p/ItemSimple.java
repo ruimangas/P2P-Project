@@ -1,15 +1,31 @@
 package main.java.pt.ist.p2p;
 
 
+
 import java.io.Serializable;
+
+
+import java.io.IOException;
+import java.io.Serializable;
+
 
 
 public class ItemSimple implements Serializable{
 
+    /**
+     * 
+     */
     private static final long serialVersionUID = 1L;
+
     private String _name;
     private String _dealer;
     private int _idItem;
+
+
+    public ItemSimple(){
+    }
+
+
 
     public ItemSimple(String name, String dealer, int idItem){
          _name = name;
@@ -34,5 +50,6 @@ public class ItemSimple implements Serializable{
    }
    
 
-    
+
+
 }

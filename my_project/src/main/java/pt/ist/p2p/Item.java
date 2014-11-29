@@ -1,7 +1,10 @@
 package main.java.pt.ist.p2p;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import net.tomp2p.p2p.Peer;
 
 public class Item implements Serializable{
 
@@ -64,4 +67,6 @@ public class Item implements Serializable{
     public void setName(String name) {
         this.name = name;
     }
+    
+    
 }

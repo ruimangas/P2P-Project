@@ -36,7 +36,6 @@ public class tomp2p {
 
     private static ArrayList<String> allUsers = new ArrayList<String>();
 
-    
     public tomp2p() {
 
 
@@ -48,9 +47,7 @@ public class tomp2p {
 
         peer1 = new PeerMaker(new Number160(rnd)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
 
-
-        InetAddress address = Inet4Address.getByName(getMyIp());
-
+        InetAddress address = Inet4Address.getByName("127.0.0.1");
 
         PeerAddress peerAddress = new PeerAddress(new Number160(1), address, 10001, 10001);
 
@@ -118,12 +115,9 @@ public class tomp2p {
                         acceptBid();
                         break;
                     case 5:
-                        itemDetails();
-                        break;
-                    case 6:
                         history();
                         break;
-                    case 7:
+                    case 6:
                         userManagement();
                         break;
                     case 0:
@@ -139,6 +133,12 @@ public class tomp2p {
         }
     }
 
+     public static void showItemMenu(){
+        
+        System.out.println("1 - Bid on Item");
+        System.out.println("2 - See Item Details");
+        System.out.println("0 - Go Back");
+     }
 
     public static void offerItem() throws IOException, ClassNotFoundException {
 
@@ -169,6 +169,8 @@ public class tomp2p {
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
+
+
 
     }
 
@@ -216,19 +218,46 @@ public class tomp2p {
               items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands, myQuery);
                     
             }
-        
        }catch (Exception e) {
           System.out.println(e.getMessage());
        }
 
-        for (ItemSimple item : items){
-           
-         
-              System.out.println("Name: " + SearchServiceDHT.searchItem(peer1, item).getName() + " Dealer: " + SearchServiceDHT.searchItem(peer1, item).getDealer());
-            
-        }
-        
+        SearchServiceDHT.listItems(items);
         SearchServiceDHT.clearMySearch();
+        
+        Scanner keyboard = new Scanner(System.in);
+        int key = keyboard.nextInt();
+        
+        while(key!=0){
+        	ItemSimple itemSimple = items.get(key-1);
+        	Item item = SearchServiceDHT.searchItem(peer1, itemSimple);
+        	showItemMenu();
+        	
+        	int key2 = keyboard.nextInt();
+        	if(key2==1){
+        		System.out.println("Bid value:");
+        		int bidValue = keyboard.nextInt();
+        		
+        		try{
+	        		
+        		    BidOnItemService.bid(new Bid(u.getUsername(), bidValue), peer1, item);
+	        	
+	        	}catch(Exception e){
+        			System.out.println(e.getMessage());
+        		}
+        	}	
+            
+        	if(key2==2){
+                
+                SeeItemsDetailsServiceDHT.seeItemsDetails(peer1, item);
+            }
+        		
+        	
+        	SearchServiceDHT.listItems(items);
+        	key = keyboard.nextInt();
+    	
+        }
+        keyboard.close();
 
 
     }
@@ -242,50 +271,10 @@ public class tomp2p {
         System.out.println("not yet done");
     }
 
-    public static void itemDetails() {
-        
-        String itemName;
-        String dealer;
-        Scanner keyboard1 = new Scanner(System.in);
-        
-        System.out.println("Item name:");
-        
-        itemName = keyboard1.nextLine();
-        
-        System.out.println("Dealer:");
-        dealer = keyboard1.nextLine();
-        
-        
-       try {
-        
-           SeeItemsDetailsServiceDHT.seeItemsDetails(peer1, itemName, dealer);
     
-       } catch (ClassNotFoundException e) {
-        
-          e.printStackTrace();
-       } catch (IOException e) {
-        
-          e.printStackTrace();
-       }
-        
-    }
 
     public static void history() {
-        
-        
-        try {
-           
-            HistoryServiceDHT.seeHistory(peer1, u);
-        
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        
+        System.out.println("not yet done");
     }
 
     public static void userManagement(){
@@ -346,7 +335,8 @@ public class tomp2p {
 
         return false;
     }
-
+    
+    
     public static void register() throws IOException {
 
         System.out.println("Register Menu");
@@ -372,6 +362,9 @@ public class tomp2p {
             }
         }
     }
+
+    
+    
 
     public static Gossip getGossip() {
         return gossip;
@@ -563,6 +556,7 @@ class countUsers extends Thread {
         }
     }
 }
+
 
 
 
