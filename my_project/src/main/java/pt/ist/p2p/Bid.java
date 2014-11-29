@@ -2,22 +2,34 @@ package main.java.pt.ist.p2p;
 
 public class Bid {
 
-    private String _userID;
+    private String _buyer;
     private int _bid;
-    
-    public Bid(String userID,int bid){
-        _userID = userID;
+    private String _nameItem;
+    private String _dealer
+    ;
+    public Bid(String buyer,int bid, String nameItem,String dealer){
+        _buyer = buyer;
         _bid = bid;
+        _dealer = dealer;
+        _nameItem = nameItem;
     }
    
     
-    public String getUserID(){
-        return _userID;
+    public String getBuyer(){
+        return _buyer;
     }
     
   
     public int getBid(){
         return _bid;
+    }
+    
+    public String getItemName(){
+        return _nameItem;
+    }
+    
+    public String getDealer(){
+        return _dealer;
     }
     
     
@@ -26,8 +38,8 @@ public class Bid {
    
     }
     
-    public void setUserID(String newUserID){
-        _userID = newUserID;
+    public void setBuyer(String newUserID){
+        _buyer = newUserID;
     }
     
 }

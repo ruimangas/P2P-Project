@@ -26,7 +26,7 @@ public class SeeItemsDetailsServiceDHT {
 
     public static void seeItemsDetails(Peer myPeer,String nomeItem, String dealer) throws ClassNotFoundException, IOException{
         
-        List<Number160> myReferences = new ArrayList<Number160>();
+  /*      List<Number160> myReferences = new ArrayList<Number160>();
         List<ItemSimple> myItems = new ArrayList<ItemSimple>();
         ItemSimple myItem = null;
         Number160 myHash;
@@ -47,9 +47,11 @@ public class SeeItemsDetailsServiceDHT {
         System.out.println("Bid History: ");
         
         for(Bid b : myItem.getAllBidders())
-            System.out.println("Bidder: "+b.getUserID() + " | " + "Value: " +b.getBid());
-    }
+            System.out.println("Bidder: "+b.getBuyer() + " | " + "Value: " +b.getBid());
+    }*/
     
     
+    
+}
     
 }

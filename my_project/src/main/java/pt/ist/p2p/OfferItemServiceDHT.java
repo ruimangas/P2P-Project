@@ -24,24 +24,35 @@ import net.tomp2p.storage.Data;
 public class OfferItemServiceDHT {
 
     
-    public static void putDatItem(Peer myPeer,ItemSimple item) throws IOException{
+    public static void putDatItem(Peer myPeer,ItemSimple itemSimple, Item item) throws IOException{
+       
         
-        final String myTitle = item.getName();
+        final int myID = item.getID();
+        
+        Number160 searchID = Number160.createHash(myID);
+        Number160 domainKey = Number160.createHash("ITEMS");
+        FutureDHT futurePutItem = myPeer.put(searchID).setData(new Data(item)).setDomainKey(domainKey).start();
+        futurePutItem.awaitUninterruptibly();
+        
+        final String myTitle = itemSimple.getName();
 
         Number160 searchKey = Number160.createHash(myTitle);
         System.out.println(searchKey);
-        FutureDHT futurePut = myPeer.add(searchKey).setData(new Data(item)).start();
-        futurePut.awaitUninterruptibly();
+        FutureDHT futurePutItemSimple = myPeer.add(searchKey).setData(new Data(itemSimple)).setDomainKey(domainKey).start();
+      
+        futurePutItemSimple.awaitUninterruptibly(); 
         
         String[] keyWords = myTitle.split("[ ]");
-        
+       
         if(keyWords.length != 1){
             for(String index : keyWords){
-                
+            
                 Number160 keyWord = Number160.createHash(index);
-                myPeer.add(keyWord).setData(new Data(searchKey)).start().awaitUninterruptibly();
-                
+                myPeer.add(keyWord).setData(new Data(searchKey)).setDomainKey(domainKey).start().awaitUninterruptibly();
+               
             }
         }
+       
     }
+    
 }

@@ -36,6 +36,7 @@ public class tomp2p {
 
     private static ArrayList<String> allUsers = new ArrayList<String>();
 
+    
     public tomp2p() {
 
 
@@ -141,7 +142,11 @@ public class tomp2p {
 
     public static void offerItem() throws IOException, ClassNotFoundException {
 
-        ItemSimple item = new ItemSimple();
+        ItemSimple itemSimple;
+        int idItem = rnd.nextInt(); 
+        
+        Item item = new Item(idItem);
+        
         Scanner keyboard1 = new Scanner(System.in);
 
         System.out.println("Please, enter the name of the product:");
@@ -150,13 +155,20 @@ public class tomp2p {
         System.out.println("Please, enter the description of the product:");
         String itemDescription = keyboard1.nextLine();
 
+        itemSimple = new ItemSimple(itemTitle,u.getUsername(),idItem);
+        
         item.setName(itemTitle.toLowerCase());
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
-        u.setOfferedItem(itemTitle);
+        u.setOfferedItem(item);
 
-        OfferItemServiceDHT.putDatItem(peer1, item);
-
+        try{
+        
+            OfferItemServiceDHT.putDatItem(peer1, itemSimple,item);
+        
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
 
     }
 
@@ -174,19 +186,20 @@ public class tomp2p {
         String[] choice = s.split("[ ]");
         List<String> myOperators = new ArrayList<String>();
         List<String> myOperands = new ArrayList<String>();
+        List<String> myQuery =  new ArrayList<String>();
         List<Number160> hashSimple;
 
         
         for (String st : choice) {
-            if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
+            if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or"))
                 myOperators.add(st.toLowerCase());
             else
                 myOperands.add(st);
-
-
+            myQuery.add(st);
         }
-
-        try {  
+        
+        
+       try {  
             
             if(myOperators.size() == 0){
             
@@ -196,11 +209,11 @@ public class tomp2p {
                 hashSimple = SearchServiceDHT.findReference(peer1, myOperands.get(0));
                 
                 items = SearchServiceDHT.search(peer1,hashSimple);
-             
+                
             
             }else{
                 
-              items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands);
+              items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands, myQuery);
                     
             }
         
@@ -208,9 +221,13 @@ public class tomp2p {
           System.out.println(e.getMessage());
        }
 
-        for (ItemSimple item : items)
-            System.out.println("Name: " + item.getName() + " Dealer: " + item.getDealer());
-
+        for (ItemSimple item : items){
+           
+         
+              System.out.println("Name: " + SearchServiceDHT.searchItem(peer1, item).getName() + " Dealer: " + SearchServiceDHT.searchItem(peer1, item).getDealer());
+            
+        }
+        
         SearchServiceDHT.clearMySearch();
 
 
@@ -254,7 +271,21 @@ public class tomp2p {
     }
 
     public static void history() {
-        System.out.println("not yet done");
+        
+        
+        try {
+           
+            HistoryServiceDHT.seeHistory(peer1, u);
+        
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        
     }
 
     public static void userManagement(){
@@ -281,24 +312,31 @@ public class tomp2p {
 
             System.out.println("user:");
             Scanner keyboard2 = new Scanner(System.in);
-            String s2 = keyboard2.nextLine();
-            String myHash = s2 + USERNAMES;
-            FutureDHT futureDHT = peer1.get(Number160.createHash(myHash)).start();
+            String username = keyboard2.nextLine();
+            Number160 userKey = Number160.createHash(USERNAMES); 
+            FutureDHT futureDHT = peer1.get(Number160.createHash(username)).setDomainKey(userKey).start();
             futureDHT.awaitUninterruptibly();
-
+            String userName = "";
+            
             if (futureDHT.isSuccess()) {
                 user = (User) futureDHT.getData().getObject();
+                
                 if (user.getUsername().equals("admin")) {
+                    
                     System.out.println("you are logged in as admin");
-                    u.setUsername("admin");
-                    return true;
+                    userName = "admin";
+                    
                 } else {
-                    u.setUsername(user.getUsername());
+                    
                     System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
                     System.out.println("you are logged in as " + user.getUsername());
-                    return true;
+                    userName = user.getUsername();
                 }
 
+                u.setUsername(userName);
+                u.setBiddedItems(user.getBiddedItems());
+                return true;
+                
             } else {
                 System.out.println("User not found");
                 register();
@@ -318,17 +356,17 @@ public class tomp2p {
             System.out.println("Username:");
 
             Scanner keyboard1 = new Scanner(System.in);
-            String s = keyboard1.nextLine();
-            String userKey = s + USERNAMES;
-            FutureDHT futureDHT = peer1.get(Number160.createHash(userKey)).start();
+            String username = keyboard1.nextLine();
+            Number160 userKey = Number160.createHash(USERNAMES);
+            FutureDHT futureDHT = peer1.get(Number160.createHash(username)).setDomainKey(userKey).start();
             futureDHT.awaitUninterruptibly();
 
             if (futureDHT.isSuccess()) {
                 System.out.println("user already exists. Please choose another username");
 
             } else {
-                u.setUsername(s);
-                peer1.put(Number160.createHash(userKey)).setData(new Data(u)).start().awaitUninterruptibly();
+                u.setUsername(username);
+                peer1.put(Number160.createHash(username)).setData(new Data(u)).setDomainKey(userKey).start().awaitUninterruptibly();
                 System.out.println("you are logged in as " + u.getUsername());
                 break;
             }

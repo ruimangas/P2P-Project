@@ -25,14 +25,14 @@ public class SearchServiceDHT {
  
    
    private static List<Number160> myCandidates = new ArrayList<Number160>();
-  
+   private static Number160 domainKey = Number160.createHash("ITEMS");
    
    public static List<Number160> findReference(Peer peer,String index) throws ClassNotFoundException, IOException{
        
        int counterRef = 0;
        Number160 keyKeyword = Number160.createHash(index);
        Number160 myHash;
-       FutureDHT futureGet = peer.get(keyKeyword).setAll().start();
+       FutureDHT futureGet = peer.get(keyKeyword).setDomainKey(domainKey).setAll().start();
        futureGet.awaitUninterruptibly();
        List<Number160> myReferences = new ArrayList<Number160>();
        List<Number160> myReferencesDev = new ArrayList<Number160>();
@@ -83,7 +83,7 @@ public class SearchServiceDHT {
       
         for(Number160 number: search){
             
-            FutureDHT futureGet = myPeer.get(number).setAll().start().awaitUninterruptibly();
+            FutureDHT futureGet = myPeer.get(number).setDomainKey(domainKey).setAll().start().awaitUninterruptibly();
       
             if(futureGet.isSuccess()){         
                
@@ -104,7 +104,26 @@ public class SearchServiceDHT {
         return items;
     }  
            
-    public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myOperands) throws ClassNotFoundException, IOException{
+   
+     public static Item searchItem(Peer myPeer, ItemSimple itemSimple) throws ClassNotFoundException, IOException{
+         
+        Number160 keyWord = Number160.createHash(itemSimple.getIdItem());
+        Item item = null;
+         
+        FutureDHT futureGet = myPeer.get(keyWord).setDomainKey(domainKey).start().awaitUninterruptibly(); 
+         
+        if(futureGet.isSuccess()){
+           item = (Item)futureGet.getData().getObject(); 
+        }
+         
+        return item;
+         
+     }
+   
+   
+   
+   
+    public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myOperands,List<String> myQuery) throws ClassNotFoundException, IOException{
                   
              int numOperators = myOperators.size();
              int numOperands = myOperands.size();
@@ -113,9 +132,15 @@ public class SearchServiceDHT {
              String myOperator = "";
              List<Number160> mySearch;
              List<List<Number160>> mySearches = new ArrayList<List<Number160>>();
-           
+             List<List<Number160>> myNotOperands = new ArrayList<List<Number160>>();
+             int numNots = 0;
+             
+                 
+             
              
              for(int j=0;j<numOperands;j++){
+                 
+                     
                  
                  mySearch = new ArrayList<Number160>();
                  mySearch = findReference(myPeer,myOperands.get(j));
@@ -129,6 +154,8 @@ public class SearchServiceDHT {
             for(int i=numOperators -1;i>=0;i--){
           
                  myOperator = myOperators.get(i);
+                 
+               
                  
                  if(numOperands > 1)
                     theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
