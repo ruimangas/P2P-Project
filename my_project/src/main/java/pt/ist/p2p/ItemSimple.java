@@ -1,20 +1,25 @@
 package main.java.pt.ist.p2p;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+
+import net.tomp2p.p2p.Peer;
 
 public class ItemSimple implements Serializable{
 
-
+    /**
+     * 
+     */
     private static final long serialVersionUID = 1L;
     private String description;
     private String name;
-    private ArrayList<Bid> allBidders = new ArrayList<Bid>();
+    private List<Bid> allBidders;
     private String dealer;
     private boolean sold;
 
     public ItemSimple(){
-
     }
 
 
@@ -42,12 +47,12 @@ public class ItemSimple implements Serializable{
         this.description = description;
     }
 
-    public ArrayList<Bid> getAllBidders() {
-        return allBidders;
+    public List<Bid> getAllBidders() {
+        return this.allBidders;
     }
 
     public void setBidder(Bid bid){
-        allBidders.add(bid);
+        this.allBidders.add(bid);
     }
 
     public String getName() {
@@ -56,5 +61,13 @@ public class ItemSimple implements Serializable{
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public void showItemInformation(Peer peer) throws ClassNotFoundException, IOException{
+    	System.out.println("Name: " + getName() + " Dealer: " + getDealer());
+    	System.out.println("	"+getDescription());
+    	BidOnItemService.getBid(peer, this);
+    	System.out.println("1 - Bid on Item");
+    	System.out.println("0 - Go Back");
     }
 }

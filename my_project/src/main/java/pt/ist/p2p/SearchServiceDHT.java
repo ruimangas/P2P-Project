@@ -182,7 +182,18 @@ public class SearchServiceDHT {
        
        myCandidates.clear();
    }
-    
+   
+   public static void listItems(List<ItemSimple> items) {
+		int i = 1;
+      System.out.println("****************** Results *********************");
+      System.out.println("************************************************");
+      for (ItemSimple item : items){
+      	System.out.println(i+" - Name: " + item.getName() + " Dealer: " + item.getDealer());
+          i++;
+      }
+      System.out.println("************************************************");
+      System.out.println("Press 0 to go back or press the item number to see details and bid");
+	}
 
  }
         

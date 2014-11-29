@@ -206,10 +206,33 @@ public class tomp2p {
           System.out.println(e.getMessage());
        }
 
-        for (ItemSimple item : items)
-            System.out.println("Name: " + item.getName() + " Dealer: " + item.getDealer());
-
+        SearchServiceDHT.listItems(items);
         SearchServiceDHT.clearMySearch();
+        
+        Scanner keyboard = new Scanner(System.in);
+        int key = keyboard.nextInt();
+        
+        while(key!=0){
+        	ItemSimple item = items.get(key-1);
+        	item.showItemInformation(peer1);
+        	
+        	int key2 = keyboard.nextInt();
+        	if(key2==1){
+        		System.out.println("Bid value:");
+        		int bidValue = keyboard.nextInt();
+        		try{
+	        		BidOnItemService.bid(new Bid(u.getUsername(), bidValue), peer1, item);
+	        		BidOnItemService.getBid(peer1, items.get(key-1));
+	        	}catch(Exception e){
+        			System.out.println(e.getMessage());
+        		}
+        		
+        	}
+        	SearchServiceDHT.listItems(items);
+        	key = keyboard.nextInt();
+    	
+        }
+        keyboard.close();
 
 
     }

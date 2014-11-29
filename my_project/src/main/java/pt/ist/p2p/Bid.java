@@ -1,13 +1,16 @@
 package main.java.pt.ist.p2p;
 
-public class Bid {
+import java.io.Serializable;
 
+public class Bid implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
     private String _userID;
     private int _bid;
     
     public Bid(String userID,int bid){
-        _userID = userID;
-        _bid = bid;
+        this._userID = userID;
+        this._bid = bid;
     }
    
     

@@ -21,16 +21,22 @@ import net.tomp2p.replication.Replication;
 import net.tomp2p.rpc.DirectDataRPC;
 import net.tomp2p.storage.Data;
 
+
+
+
+
+
 public class OfferItemServiceDHT {
 
     
     public static void putDatItem(Peer myPeer,ItemSimple item) throws IOException{
         
-        final String myTitle = item.getName();
-
+       final String myTitle = item.getName();    
         Number160 searchKey = Number160.createHash(myTitle);
+        Number160 contentKey = Number160.createHash(item.getDealer());
+        
         System.out.println(searchKey);
-        FutureDHT futurePut = myPeer.add(searchKey).setData(new Data(item)).start();
+        FutureDHT futurePut = myPeer.put(searchKey).setData(contentKey,new Data(item)).start();
         futurePut.awaitUninterruptibly();
         
         String[] keyWords = myTitle.split("[ ]");
@@ -43,5 +49,6 @@ public class OfferItemServiceDHT {
                 
             }
         }
+       
     }
 }
