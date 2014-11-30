@@ -47,6 +47,21 @@ public class SeeItemsDetailsServiceDHT {
            System.out.println("Bidders:");
            BidOnItemService.getBid(myPeer, item);
     
-     }
+    }
+    
+    public static Item getSpecificItem(Peer myPeer, String userName, String itemName) throws ClassNotFoundException, IOException{
+		FutureDHT futureGet = myPeer.get(Number160.createHash(userName)).setDomainKey(Number160.createHash(OFFITEMS)).setAll().start().awaitUninterruptibly();
+		Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
+		Object o;
+		int counterItem = 0;
+        while(counterItem < futureGet.getDataMap().size()){         
+            o = iteratorItem.next().getObject();
+            Item item = (Item) o;
+            if(item.getName().equals(itemName))
+            	return item;
+            counterItem++;
+        }  
+		return null;
+	}
     
 }

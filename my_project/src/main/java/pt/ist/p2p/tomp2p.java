@@ -94,14 +94,16 @@ public class tomp2p {
 		try {
 
 			while (true) {
-				System.out.println("operation number:");
+				System.out.println("\n*****************************");
+				System.out.println("*          P2PBAY           *");
+				System.out.println("*****************************");
 				System.out.println("1 - offer an item for sale");
 				System.out.println("2 - search for an item to buy");
 				System.out.println("3 - accept a bid");
 				System.out.println("4 - view item details");
 				System.out.println("5 - purchase and bidding history");
 				if (u.getUsername().equals("admin"))
-					System.out.println("7 - user management");
+					System.out.println("6 - user management");
 				System.out.println("0 - exit app");
 
 				int numero = keyboard.nextInt();
@@ -116,9 +118,12 @@ public class tomp2p {
 					acceptBid();
 					break;
 				case 4:
-					history();
+					showItemDetails();
 					break;
 				case 5:
+					history();
+					break;
+				case 6:
 					userManagement();
 					break;
 				case 0:
@@ -176,6 +181,7 @@ public class tomp2p {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+		keyboard1.close();
 	}
 
 	public double getActualNumberFiles() {
@@ -311,7 +317,24 @@ public class tomp2p {
 	public static void history() throws ClassNotFoundException, IOException {
 		HistoryServiceDHT.getHistory(peer1, u.getUsername());
 	}
+	
+	public static void showItemDetails() throws ClassNotFoundException, IOException {
+		Scanner input = new Scanner(System.in);
 
+		System.out.println("Please, enter the name of the item:");
+		String itemTitle = input.nextLine();
+
+		System.out.println("Please, enter the dealer name:");
+		String dealer = input.nextLine();
+		try {		
+			Item item = SeeItemsDetailsServiceDHT.getSpecificItem(peer1, dealer, itemTitle);
+			SeeItemsDetailsServiceDHT.seeItemsDetails(peer1, item);
+		} catch (Exception e) {
+			System.out.println("There is no item with that parameters");
+			//System.out.println(e.getMessage());
+		}
+
+	}
 	public static void userManagement() {
 
 		if (u.getUsername().equals("admin")) {
@@ -337,9 +360,9 @@ public class tomp2p {
 		Scanner keyboard1 = new Scanner(System.in);
 		String s = keyboard1.nextLine();
 
-		if (s.equals("yes")) {
+		if (s.equals("yes") || s.equals("y")) {
 
-			System.out.println("user:");
+			System.out.println("User:");
 			Scanner keyboard2 = new Scanner(System.in);
 			String username = keyboard2.nextLine();
 			Number160 userKey = Number160.createHash(USERNAMES);
@@ -353,14 +376,14 @@ public class tomp2p {
 
 				if (user.getUsername().equals("admin")) {
 
-					System.out.println("you are logged in as admin");
+					System.out.println("You are logged in as admin");
 					userName = "admin";
 
 				} else {
 
 					System.out
 							.println("******** WELCOME TO TOMP2P AUCTIONS ********");
-					System.out.println("you are logged in as "
+					System.out.println("You are logged in as "
 							+ user.getUsername());
 					userName = user.getUsername();
 				}
