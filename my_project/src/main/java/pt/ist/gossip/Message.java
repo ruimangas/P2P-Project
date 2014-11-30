@@ -26,6 +26,10 @@ public class Message implements Serializable{
 
     }
 
+    public void setValue(double value) {
+        this.value = value;
+    }
+
     public double getId() {
         return id;
     }

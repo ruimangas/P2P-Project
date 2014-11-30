@@ -14,6 +14,7 @@ import net.tomp2p.futures.FutureCreate;
 import net.tomp2p.message.Message;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
+import net.tomp2p.p2p.builder.DHTBuilder;
 import net.tomp2p.p2p.builder.PutBuilder;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
@@ -34,7 +35,6 @@ public class OfferItemServiceDHT {
         System.out.println(searchKey);
         FutureDHT futurePut = myPeer.add(searchKey).setData(new Data(item)).start();
         futurePut.awaitUninterruptibly();
-        
         String[] keyWords = myTitle.split("[ ]");
         
         if(keyWords.length != 1){
