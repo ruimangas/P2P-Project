@@ -80,7 +80,7 @@ public class SearchServiceDHT {
        
        List<ItemSimple> items = new ArrayList<ItemSimple>();
        Object o;
-      
+       
         for(Number160 number: search){
             
             FutureDHT futureGet = myPeer.get(number).setDomainKey(domainKey).setAll().start().awaitUninterruptibly();
@@ -93,9 +93,12 @@ public class SearchServiceDHT {
                  
                    o = iteratorItem.next().getObject();
                    
-                   if(!(o.getClass().equals(number.getClass())))
-                      items.add((ItemSimple)o);
+                   if(!(o.getClass().equals(number.getClass()))){
+                       
+                       
+                       items.add((ItemSimple)o);
                    
+                   }
                    counterItem++;
                }
               counterItem = 0;
@@ -105,18 +108,24 @@ public class SearchServiceDHT {
     }  
            
    
-     public static Item searchItem(Peer myPeer, ItemSimple itemSimple) throws ClassNotFoundException, IOException{
+     public static List<Item> searchItem(Peer myPeer, List<ItemSimple> itemSimples) throws ClassNotFoundException, IOException{
          
-        Number160 keyWord = Number160.createHash(itemSimple.getIdItem());
-        Item item = null;
-         
-        FutureDHT futureGet = myPeer.get(keyWord).setDomainKey(domainKey).start().awaitUninterruptibly(); 
-         
-        if(futureGet.isSuccess()){
-           item = (Item)futureGet.getData().getObject(); 
-        }
-         
-        return item;
+        List<Item> items = new ArrayList<Item>();
+        Item item;
+        
+        for(ItemSimple i:itemSimples){
+            
+            Number160 keyWord = Number160.createHash(i.getIdItem());
+             
+            FutureDHT futureGet = myPeer.get(keyWord).setDomainKey(domainKey).start().awaitUninterruptibly(); 
+             
+            if(futureGet.isSuccess()){
+               
+               item = (Item)futureGet.getData().getObject();
+               items.add(item);
+            }
+        } 
+        return items;
          
      }
    
@@ -210,13 +219,17 @@ public class SearchServiceDHT {
        myCandidates.clear();
    }
    
-   public static void listItems(List<ItemSimple> items) {
+   public static void listItems(List<Item> items) {
 		int i = 1;
       System.out.println("****************** Results *********************");
       System.out.println("************************************************");
-      for (ItemSimple item : items){
-      	System.out.println(i+" - Name: " + item.getName() + " Dealer: " + item.getDealer());
-          i++;
+      
+      for (Item item : items){
+        
+          if(!item.getSold()){  
+      	   System.out.println(i+" - Name: " + item.getName() + " Dealer: " + item.getDealer());
+            i++;
+        } 
       }
       System.out.println("************************************************");
       System.out.println("Press 0 to go back or press the item number to see details and bid");

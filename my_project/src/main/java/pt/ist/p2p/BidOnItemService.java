@@ -41,11 +41,10 @@ public class BidOnItemService {
 	    
 	    while(iteratorBids.hasNext()){
 	        
-	        theChamp = bid.getBid();
 	        Bid bidLocal = (Bid) iteratorBids.next().getObject();
 	        theContender = bidLocal.getBid();
 	        
-	        if(theContender >= bid.getBid())
+	        if(theContender >= theChamp)
 	            theChamp = theContender;
 	    }
 	    

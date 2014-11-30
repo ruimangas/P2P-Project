@@ -93,10 +93,9 @@ public class tomp2p {
                 System.out.println("operation number:");
                 System.out.println("1 - offer an item for sale");
                 System.out.println("2 - search for an item to buy");
-                System.out.println("3 - bid on an item");
-                System.out.println("4 - accept a bid");
-                System.out.println("5 - view item details");
-                System.out.println("6 - purchase and bidding history");
+                System.out.println("3 - accept a bid");
+                System.out.println("4 - view item details");
+                System.out.println("5 - purchase and bidding history");
                 if(u.getUsername().equals("admin")) System.out.println("7 - user management");
                 System.out.println("0 - exit app");
 
@@ -109,15 +108,12 @@ public class tomp2p {
                         searchItem();
                         break;
                     case 3:
-                        bidOnItem();
-                        break;
-                    case 4:
                         acceptBid();
                         break;
-                    case 5:
+                    case 4:
                         history();
                         break;
-                    case 6:
+                    case 5:
                         userManagement();
                         break;
                     case 0:
@@ -140,6 +136,15 @@ public class tomp2p {
         System.out.println("0 - Go Back");
      }
 
+     public static void showAcceptanceMenu(){
+         
+         System.out.println("1 - AcceptBid");
+         System.out.println("2 - See Item Details");
+         System.out.println("0 - Go Back");
+      }
+     
+     
+     
     public static void offerItem() throws IOException, ClassNotFoundException {
 
         ItemSimple itemSimple;
@@ -181,7 +186,8 @@ public class tomp2p {
     public static void searchItem() throws IOException, ClassNotFoundException {
 
 
-        List<ItemSimple> items = new ArrayList<ItemSimple>();
+        List<ItemSimple> itemSimples = new ArrayList<ItemSimple>();
+        List<Item> items = new ArrayList<Item>();
         System.out.println("String to search:");
         Scanner keyboard1 = new Scanner(System.in);
         String s = keyboard1.nextLine();
@@ -210,18 +216,20 @@ public class tomp2p {
      
                 hashSimple = SearchServiceDHT.findReference(peer1, myOperands.get(0));
                 
-                items = SearchServiceDHT.search(peer1,hashSimple);
+                itemSimples = SearchServiceDHT.search(peer1,hashSimple);
                 
             
             }else{
                 
-              items = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands, myQuery);
+              itemSimples = SearchServiceDHT.booleanSearch(peer1, myOperators, myOperands, myQuery);
                     
             }
        }catch (Exception e) {
           System.out.println(e.getMessage());
        }
 
+        items = SearchServiceDHT.searchItem(peer1, itemSimples);
+       
         SearchServiceDHT.listItems(items);
         SearchServiceDHT.clearMySearch();
         
@@ -229,8 +237,7 @@ public class tomp2p {
         int key = keyboard.nextInt();
         
         while(key!=0){
-        	ItemSimple itemSimple = items.get(key-1);
-        	Item item = SearchServiceDHT.searchItem(peer1, itemSimple);
+        	Item item = items.get(key-1);
         	showItemMenu();
         	
         	int key2 = keyboard.nextInt();
@@ -262,14 +269,54 @@ public class tomp2p {
 
     }
 
-    public static void bidOnItem() throws IOException, ClassNotFoundException {
-        System.out.println("not yet done");
-    }
+   
 
     public static void acceptBid() {
 
-        System.out.println("not yet done");
-    }
+        List<Item> items;
+        items = u.getOfferedItems();
+        SearchServiceDHT.listItems(items);
+        
+        Scanner keyboard = new Scanner(System.in);
+        int key = keyboard.nextInt();
+        
+        
+        while(key!=0){
+            
+            Item item = items.get(key-1);
+           
+            showAcceptanceMenu();
+            
+            int key2 = keyboard.nextInt();
+            
+            if(key2==1){
+                
+                item.setSold(true);
+                ItemSimple itemRemove = null;
+                
+            }   
+            
+            if(key2==2){
+                
+                try {
+                    
+                    SeeItemsDetailsServiceDHT.seeItemsDetails(peer1, item);
+                    
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+                
+            
+            SearchServiceDHT.listItems(items);
+            key = keyboard.nextInt();
+        
+        }
+        keyboard.close();
+        
+   }
 
     
 
