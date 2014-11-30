@@ -63,4 +63,10 @@ public class OfferItemServiceDHT {
        
     }
     
+    public static void removeDatItem(Peer myPeer,Item item) throws IOException{
+    	final int myID = item.getID();
+        Number160 itemId = Number160.createHash(myID);
+        Number160 domainKey = Number160.createHash("ITEMS");
+        myPeer.remove(itemId).setDomainKey(domainKey).start().awaitUninterruptibly();
+    }
 }

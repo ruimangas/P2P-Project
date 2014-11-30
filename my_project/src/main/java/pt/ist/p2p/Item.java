@@ -12,7 +12,7 @@ public class Item implements Serializable{
     private static final long serialVersionUID = 1L;
     private String description;
     private String name;
-    private ArrayList<Bid> allBidders = new ArrayList<Bid>();
+    private int soldValue = 0;
     private String dealer;
     private int idItem; 
     private boolean sold;
@@ -52,12 +52,12 @@ public class Item implements Serializable{
         this.description = description;
     }
 
-    public ArrayList<Bid> getAllBidders() {
-        return allBidders;
+    public int getSoldValue() {
+        return soldValue;
     }
 
-    public void setBidder(Bid bid){
-        allBidders.add(bid);
+    public void setSoldValue(int value){
+        this.soldValue = value;
     }
 
     public String getName() {

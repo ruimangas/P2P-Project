@@ -23,7 +23,24 @@ import net.tomp2p.storage.Data;
 
 
 public class SeeItemsDetailsServiceDHT {
+	
+	private static String OFFITEMS = "offeredItems";
+    
 
+	public static List<Item> getUserItems(Peer myPeer, String userName) throws ClassNotFoundException, IOException{
+		List<Item> listItems = new ArrayList<Item>();
+		FutureDHT futureGet = myPeer.get(Number160.createHash(userName)).setDomainKey(Number160.createHash(OFFITEMS)).setAll().start().awaitUninterruptibly();
+		Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
+		Object o;
+		int counterItem = 0;
+        while(counterItem < futureGet.getDataMap().size()){         
+            o = iteratorItem.next().getObject();
+            listItems.add((Item) o);
+            counterItem++;
+        }  
+		return listItems;
+	}
+	
     public static void seeItemsDetails(Peer myPeer,Item item) throws ClassNotFoundException, IOException{
         
            System.out.println("Nome Item: "+item.getName() +  " | " + "Description: " + item.getDescription());

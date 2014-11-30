@@ -31,7 +31,11 @@ public class tomp2p {
     private static Random rnd = new Random();
 
     private static String USERNAMES = "username";
-
+    
+    private static String OFFITEMS = "offeredItems";
+    
+    private static String PURCHASEDITEMS = "purchasedItems";
+    
     private static Gossip gossip = new Gossip();
 
     private static ArrayList<String> allUsers = new ArrayList<String>();
@@ -166,17 +170,20 @@ public class tomp2p {
         item.setDescription(itemDescription);
         item.setDealer(u.getUsername());
         u.setOfferedItem(item);
-
+        
+        Number160 domainKey = Number160.createHash(OFFITEMS);
+        Number160 userName = Number160.createHash(u.getUsername());
+        Number160 contentKey = Number160.createHash(item.getName());
+        
         try{
         
             OfferItemServiceDHT.putDatItem(peer1, itemSimple,item);
+            peer1.put(userName).setData(contentKey,new Data(item)).setDomainKey(domainKey).start().awaitUninterruptibly();
+    		
         
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
-
-
-
     }
 
     public double getActualNumberFiles(){
@@ -247,7 +254,7 @@ public class tomp2p {
         		
         		try{
 	        		
-        		    BidOnItemService.bid(new Bid(u.getUsername(), bidValue), peer1, item);
+        		    BidOnItemService.bid(new Bid(u.getUsername(), bidValue, item.getName()), peer1, item);
 	        	
 	        	}catch(Exception e){
         			System.out.println(e.getMessage());
@@ -271,10 +278,10 @@ public class tomp2p {
 
    
 
-    public static void acceptBid() {
-
+    public static void acceptBid() throws ClassNotFoundException, IOException {
+    	
         List<Item> items;
-        items = u.getOfferedItems();
+        items = SeeItemsDetailsServiceDHT.getUserItems(peer1, u.getUsername());
         SearchServiceDHT.listItems(items);
         
         Scanner keyboard = new Scanner(System.in);
@@ -290,10 +297,22 @@ public class tomp2p {
             int key2 = keyboard.nextInt();
             
             if(key2==1){
-                
+            	Number160 domainKey = Number160.createHash(OFFITEMS);
+            	Number160 userName = Number160.createHash(u.getUsername());
+                Number160 contentKey = Number160.createHash(item.getName());
                 item.setSold(true);
-                ItemSimple itemRemove = null;
+                OfferItemServiceDHT.removeDatItem(peer1,item);
+                peer1.remove(userName).setContentKey(contentKey).setDomainKey(domainKey).start().awaitUninterruptibly();
                 
+                Bid bid = BidOnItemService.getHighestBid(peer1, item);
+                
+                Number160 locationKeyPurchase = Number160.createHash(bid.getUserId());
+                Number160 domainKeyPurchase = Number160.createHash(PURCHASEDITEMS);
+                
+                item.setSoldValue(bid.getBid());
+                peer1.add(locationKeyPurchase).setData(new Data(item)).setDomainKey(domainKeyPurchase).start().awaitUninterruptibly();
+        		
+            	
             }   
             
             if(key2==2){
@@ -320,8 +339,8 @@ public class tomp2p {
 
     
 
-    public static void history() {
-        System.out.println("not yet done");
+    public static void history() throws ClassNotFoundException, IOException {
+        HistoryServiceDHT.getHistory(peer1, u.getUsername());
     }
 
     public static void userManagement(){
@@ -403,6 +422,9 @@ public class tomp2p {
 
             } else {
                 u.setUsername(username);
+                System.out.println(userKey);
+                System.out.println(Number160.createHash(username));
+                
                 peer1.put(Number160.createHash(username)).setData(new Data(u)).setDomainKey(userKey).start().awaitUninterruptibly();
                 System.out.println("you are logged in as " + u.getUsername());
                 break;

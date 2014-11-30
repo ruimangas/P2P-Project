@@ -11,7 +11,7 @@ import net.tomp2p.storage.Data;
 public class BidOnItemService {
 	
     private static Number160 domainKeyBid = Number160.createHash("BIDS");
-    
+    private static Number160 domainKeyBidHISTORY = Number160.createHash("BIDSHISTORY");
 	public BidOnItemService(){
 		
 	}
@@ -51,7 +51,10 @@ public class BidOnItemService {
 	    if(theChamp == bid.getBid()){
 	            
     	    Number160 locationKey = Number160.createHash(item.getID());
-    		myPeer.add(locationKey).setData(new Data(bid)).setDomainKey(domainKeyBid).start().awaitUninterruptibly();
+    	    Number160 locationKeyHistory = Number160.createHash(bid.getUserId());
+    		
+    	    myPeer.add(locationKey).setData(new Data(bid)).setDomainKey(domainKeyBid).start().awaitUninterruptibly();
+    		myPeer.add(locationKeyHistory).setData(new Data(bid)).setDomainKey(domainKeyBidHISTORY).start().awaitUninterruptibly();
     		System.out.println(locationKey);
     		
 	    }else{
@@ -73,6 +76,20 @@ public class BidOnItemService {
 	    }
 		
 	}
-
+	
+public static Bid getHighestBid(Peer myPeer, Item item) throws IOException, ClassNotFoundException{
+		Bid highestBid = null;
+	    int bidValue = 0;
+		Iterator<Data> iteratorBids = getMyBids(myPeer, item);
+		
+		while(iteratorBids.hasNext()){
+			   Bid bidLocal =(Bid)iteratorBids.next().getObject();
+	 		   if(bidLocal.getBid()>bidValue){
+	 			   highestBid = bidLocal;
+	 			   bidValue = bidLocal.getBid();
+	 		   }
+		}
+		return highestBid;
+	}
   
 }

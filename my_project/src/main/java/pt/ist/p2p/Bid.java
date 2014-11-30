@@ -11,10 +11,14 @@ public class Bid implements Serializable{
 	private static final long serialVersionUID = 1L;
     private String _userID;
     private int _bid;
+    private String itemName;
     
-    public Bid(String userID,int bid){
+    
+
+	public Bid(String userID,int bid, String itemName){
         this._userID = userID;
         this._bid = bid;
+        this.itemName = itemName;
 
     }
    
@@ -38,5 +42,15 @@ public class Bid implements Serializable{
     public void setUserId(String newUserID){
         _userID = newUserID;
     }
+    
+    public String getItemName() {
+		return itemName;
+	}
+
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
     
 }
