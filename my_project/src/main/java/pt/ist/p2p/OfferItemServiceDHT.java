@@ -30,7 +30,10 @@ public class OfferItemServiceDHT {
 
     
     public static void putDatItem(Peer myPeer,ItemSimple itemSimple, Item item) throws IOException{
-       
+		Number160 domainKeyOffer = Number160.createHash("offeredItems");
+		Number160 userName = Number160.createHash(itemSimple.getDealer());
+		Number160 contentKey = Number160.createHash(item.getName());
+
     
        final int myID = item.getID();
         
@@ -60,6 +63,10 @@ public class OfferItemServiceDHT {
                
             }
         }
+        
+        myPeer.put(userName).setData(contentKey, new Data(item))
+		.setDomainKey(domainKeyOffer).start().awaitUninterruptibly();
+
        
     }
     

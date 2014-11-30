@@ -164,22 +164,15 @@ public class tomp2p {
 		String itemDescription = keyboard1.nextLine();
 
 		itemSimple = new ItemSimple(itemTitle, u.getUsername(), idItem);
-
 		item.setName(itemTitle.toLowerCase());
 		item.setDescription(itemDescription);
 		item.setDealer(u.getUsername());
 		u.setOfferedItem(item);
 
-		Number160 domainKey = Number160.createHash(OFFITEMS);
-		Number160 userName = Number160.createHash(u.getUsername());
-		Number160 contentKey = Number160.createHash(item.getName());
-
 		try {
 
 			OfferItemServiceDHT.putDatItem(peer1, itemSimple, item);
-			peer1.put(userName).setData(contentKey, new Data(item))
-					.setDomainKey(domainKey).start().awaitUninterruptibly();
-
+		
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
