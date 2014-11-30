@@ -118,6 +118,7 @@ public class tomp2p {
     public static  void printStorage(){
 
         int i=0;
+        int j=0;
 
         Map<Number480, Data> map = peer1.getPeerBean().getStorage().map();
         for (Object o : map.entrySet()) {
@@ -127,9 +128,12 @@ public class tomp2p {
 
             try {
                 if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.ItemSimple")) {
-                    ItemSimple n = (ItemSimple) data.getObject();
                     i++;
                 }
+                if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.User")) {
+                    j++;
+                }
+
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -137,7 +141,8 @@ public class tomp2p {
             }
         }
 
-        System.out.println(i);
+        System.out.println(i + "files");
+        System.out.println(j + "users");
 
     }
 
@@ -255,7 +260,7 @@ public class tomp2p {
 
             System.out.println("There are " + Math.round(getGossip().calculateNumberNodes(MessageType.NODES_SUM)) + " nodes.");
             System.out.println("There are " + Math.round(getGossip().calculateNumberItems(MessageType.ITEMS_SUM))  + " items.");
-            System.out.println("There are " + Math.round(getGossip().calculateNumerUsers(MessageType.ITEMS_SUM))  + " Users.");
+            System.out.println("There are " + Math.round(getGossip().calculateNumerUsers(MessageType.USERS_SUM))  + " Users.");
 
         }
 

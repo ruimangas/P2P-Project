@@ -42,31 +42,16 @@ public class GossipService {
 
                 gossip.resetGossipNodes();
                 gossip.resetGossipFiles(peer);
-                gossip.incrementMesg();
-
-            }
-
-            if (gossip.getNodesWeightValue()>0 && gossip.getNumItemsWeight()>0) {
-                Message msg = gossip.getMessage(mType);
-                peer.sendDirect(peerAddress).setObject(msg).start();
-            }
-
-        } else {
-
-
-            if(u.getUsername()!=null && u.getUsername().equals("admin") && i%50==0){
-
-                gossip.resetGossipNodes();
-                gossip.resetGossipFiles(peer);
                 gossip.resetGossipUsers(peer);
                 gossip.incrementMesg();
 
             }
 
-            Message msg = gossip.getMessage(mType);
-            peer.sendDirect(peer.getPeerAddress()).setObject(msg).start();
+            if (gossip.getNodesWeightValue()>0 && gossip.getNumItemsWeight()>0 && gossip.getNumUsersWeight()>0) {
+                Message msg = gossip.getMessage(mType);
+                peer.sendDirect(peerAddress).setObject(msg).start();
+            }
         }
-
     }
 
     public static void setupReplyHandler(Peer peer1, Gossip g)

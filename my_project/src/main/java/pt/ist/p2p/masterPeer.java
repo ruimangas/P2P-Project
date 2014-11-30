@@ -77,13 +77,40 @@ public class masterPeer {
 
         while(true) {
 
+            int i=0;
+            int j=0;
+
+            Map<Number480, Data> map = peerMaster.getPeerBean().getStorage().map();
+            for (Object o : map.entrySet()) {
+                Map.Entry thisEntry = (Map.Entry) o;
+                Object value = thisEntry.getValue();
+                Data data = (Data) value;
+
+                try {
+                    if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.ItemSimple")) {
+                        i++;
+                    }
+                    if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.User")) {
+                        j++;
+                    }
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            System.out.println(i + "files");
+            System.out.println(j + "users");
+
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-           System.out.println("my peers:" + peerMaster.getPeerBean().getPeerMap().getAll());
+           //System.out.println("my peers:" + peerMaster.getPeerBean().getPeerMap().getAll());
         }
     }
 }

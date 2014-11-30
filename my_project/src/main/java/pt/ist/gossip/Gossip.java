@@ -76,6 +76,7 @@ public class Gossip {
             this.messageId = msg.getId();
             resetGossipNodes();
             resetGossipFiles(peer);
+            resetGossipUsers(peer);
             process(msg);
         }
     }
@@ -90,6 +91,10 @@ public class Gossip {
 
     public double getNumUsersValue() {
         return numUsersValue;
+    }
+
+    public double getNumUsersWeight() {
+        return numUsersWeight;
     }
 
     public void incrementMesg(){
@@ -117,9 +122,6 @@ public class Gossip {
             this.numUsersValue = this.numUsersValue + msg.getValue();
             this.numUsersWeight = this.numUsersWeight + msg.getWeight();
         }
-
-       //System.out.println("PESO FILES: " + this.numItemsWeight);
-
     }
 
     public synchronized Message getMessage(MessageType messageType) throws IOException{
