@@ -11,8 +11,6 @@ import net.tomp2p.replication.ReplicationExecutor;
 
 public class Gossip {
 
-    private final int REPLICATION_FACTOR = 6;
-
     private double nodesSumValue;
     private double nodesWeightValue;
     private double initialWeightValue;
@@ -32,6 +30,23 @@ public class Gossip {
     private double messageId = 0;
 
     public Gossip(){
+
+    }
+
+    public int calculateReplicationFactor(){
+
+        int replicationFactor;
+
+        int s = new tomp2p().getPeer1().getPeerBean().getPeerMap().getAll().size();
+
+        System.out.println("TAMNHO: " + s);
+
+        if(s<5){
+            replicationFactor = s+1;
+        }
+        else replicationFactor = 6;
+
+        return replicationFactor;
 
     }
 
@@ -166,7 +181,7 @@ public class Gossip {
 
         if(messageType.toString().equals("ITEMS_SUM")){
 
-            return (this.numItemsSum/this.numItemsWeight)/REPLICATION_FACTOR;
+            return (this.numItemsSum/this.numItemsWeight)/calculateReplicationFactor();
 
         }
         return 0;
@@ -176,7 +191,7 @@ public class Gossip {
 
         if(messageType.toString().equals("USERS_SUM")){
 
-            return (this.numUsersValue/this.numUsersWeight)/REPLICATION_FACTOR;
+            return (this.numUsersValue/this.numUsersWeight)/calculateReplicationFactor();
         }
 
         return 0;
