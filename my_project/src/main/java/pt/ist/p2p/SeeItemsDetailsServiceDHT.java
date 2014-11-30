@@ -48,7 +48,7 @@ public class SeeItemsDetailsServiceDHT {
            BidOnItemService.getBid(myPeer, item);
     
     }
-    
+    /*
     public static Item getSpecificItem(Peer myPeer, String userName, String itemName) throws ClassNotFoundException, IOException{
 		FutureDHT futureGet = myPeer.get(Number160.createHash(userName)).setDomainKey(Number160.createHash(OFFITEMS)).setAll().start().awaitUninterruptibly();
 		Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
@@ -62,6 +62,6 @@ public class SeeItemsDetailsServiceDHT {
             counterItem++;
         }  
 		return null;
-	}
+	}*/
     
 }

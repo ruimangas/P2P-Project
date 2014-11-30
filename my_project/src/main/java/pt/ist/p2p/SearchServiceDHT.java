@@ -233,8 +233,7 @@ public class SearchServiceDHT {
       }
       System.out.println("************************************************");
       System.out.println("Press 0 to go back or press the item number to see details and bid");
-	}
-
+   }
  }
         
     

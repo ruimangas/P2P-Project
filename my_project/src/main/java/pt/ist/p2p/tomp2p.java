@@ -100,10 +100,9 @@ public class tomp2p {
 				System.out.println("1 - offer an item for sale");
 				System.out.println("2 - search for an item to buy");
 				System.out.println("3 - accept a bid");
-				System.out.println("4 - view item details");
-				System.out.println("5 - purchase and bidding history");
+				System.out.println("4 - purchase and bidding history");
 				if (u.getUsername().equals("admin"))
-					System.out.println("6 - user management");
+					System.out.println("5 - user management");
 				System.out.println("0 - exit app");
 
 				int numero = keyboard.nextInt();
@@ -118,12 +117,9 @@ public class tomp2p {
 					acceptBid();
 					break;
 				case 4:
-					showItemDetails();
-					break;
-				case 5:
 					history();
 					break;
-				case 6:
+				case 5:
 					userManagement();
 					break;
 				case 0:
@@ -274,7 +270,7 @@ public class tomp2p {
 
 		List<Item> items;
 		items = SeeItemsDetailsServiceDHT.getUserItems(peer1, u.getUsername());
-		SearchServiceDHT.listItems(items);
+		BidOnItemService.listItemsWithBids(peer1, items);
 
 		Scanner keyboard = new Scanner(System.in);
 		int key = keyboard.nextInt();
@@ -289,8 +285,11 @@ public class tomp2p {
 
 			if (key2 == 1) {
 				item.setSold(true);
-				BidOnItemService.acceptBid(peer1, item, u);
-
+				try{
+					BidOnItemService.acceptBid(peer1, item, u);
+				}catch(Exception e){
+					System.out.println("This item has no bids, so it has been removed!");
+				}
 			}
 
 			if (key2 == 2) {
@@ -306,7 +305,7 @@ public class tomp2p {
 				}
 			}
 
-			SearchServiceDHT.listItems(items);
+			BidOnItemService.listItemsWithBids(peer1, items);
 			key = keyboard.nextInt();
 
 		}
@@ -318,7 +317,7 @@ public class tomp2p {
 		HistoryServiceDHT.getHistory(peer1, u.getUsername());
 	}
 	
-	public static void showItemDetails() throws ClassNotFoundException, IOException {
+/*	public static void showItemDetails() throws ClassNotFoundException, IOException {
 		Scanner input = new Scanner(System.in);
 
 		System.out.println("Please, enter the name of the item:");
@@ -335,6 +334,7 @@ public class tomp2p {
 		}
 
 	}
+	*/
 	public static void userManagement() {
 
 		if (u.getUsername().equals("admin")) {
