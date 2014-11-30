@@ -12,6 +12,9 @@ public class BidOnItemService {
 	
     private static Number160 domainKeyBid = Number160.createHash("BIDS");
     private static Number160 domainKeyBidHISTORY = Number160.createHash("BIDSHISTORY");
+    private static Number160 OFFITEMS = Number160.createHash("offeredItems");
+	private static Number160 PURCHASEDITEMS = Number160.createHash("purchasedItems");
+
 	public BidOnItemService(){
 		
 	}
@@ -92,4 +95,23 @@ public static Bid getHighestBid(Peer myPeer, Item item) throws IOException, Clas
 		return highestBid;
 	}
   
+public static void acceptBid(Peer myPeer, Item item, User u) throws IOException,
+ClassNotFoundException {
+	Number160 userName = Number160.createHash(u.getUsername());
+	Number160 contentKey = Number160.createHash(item.getName());
+	OfferItemServiceDHT.removeDatItem(myPeer, item);
+	myPeer.remove(userName).setContentKey(contentKey)
+		.setDomainKey(OFFITEMS).start().awaitUninterruptibly();
+	
+	Bid bid = BidOnItemService.getHighestBid(myPeer, item);
+	
+	Number160 locationKeyPurchase = Number160.createHash(bid
+		.getUserId());
+	
+	item.setSoldValue(bid.getBid());
+	myPeer.add(locationKeyPurchase).setData(new Data(item))
+		.setDomainKey(PURCHASEDITEMS).start()
+		.awaitUninterruptibly();
+}
+
 }
