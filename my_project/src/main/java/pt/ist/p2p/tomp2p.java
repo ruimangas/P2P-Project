@@ -46,7 +46,7 @@ public class tomp2p {
 
 		Bindings b = new Bindings();
 
-		peer1 = new PeerMaker(new Number160(rnd))
+		peer1 = new PeerMaker(new Number160(rnd.nextInt()))
 				.setTcpPort(Integer.parseInt(port))
 				.setUdpPort(Integer.parseInt(port)).setBindings(b)
 				.setEnableIndirectReplication(true).makeAndListen();
@@ -198,13 +198,17 @@ public class tomp2p {
 		List<Number160> hashSimple;
 
 		for (String st : choice) {
-			if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or"))
+			if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
 				myOperators.add(st.toLowerCase());
 			else
 				myOperands.add(st);
 			myQuery.add(st);
 		}
 
+		
+		System.out.println("MyOperands: "+myOperands);
+		System.out.println("MyOperators: "+myOperators);
+		
 		try {
 
 			if (myOperators.size() == 0) {

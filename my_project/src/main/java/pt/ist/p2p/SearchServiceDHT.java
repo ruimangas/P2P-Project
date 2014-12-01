@@ -142,37 +142,51 @@ public class SearchServiceDHT {
              List<Number160> mySearch;
              List<List<Number160>> mySearches = new ArrayList<List<Number160>>();
              List<List<Number160>> myNotOperands = new ArrayList<List<Number160>>();
-             int numNots = 0;
+             List<String> notOperands = new ArrayList<String>();
+            
              
+             if(myOperators.get(0).equals("not"))
+                 System.out.println("Failure!!!");
+             
+             for(int k=0;k<myQuery.size();k++){
                  
+                 if(myQuery.get(k).equals("not")){
+                     notOperands.add(myQuery.get(k+1));
+                     myOperators.remove("not");
+                 }
+                 
+             }
              
-             
+             if(myOperands.size() - myOperators.size() != 1)
+                 System.out.println("Query Rejected!!!");
+                 
              for(int j=0;j<numOperands;j++){
-                 
-                     
                  
                  mySearch = new ArrayList<Number160>();
                  mySearch = findReference(myPeer,myOperands.get(j));
+                 
+                 if(notOperands.contains(myOperands.get(j))){
+                     myNotOperands.add(mySearch);
+                     notOperands.remove(myOperands.get(j));
+                 }
+                 
                  mySearches.add(mySearch);
                  
              }
-           
-            
-            myCandidates = mySearches.get(0);
              
-            for(int i=numOperators -1;i>=0;i--){
+             
+          myCandidates = mySearches.get(0);
+             
+            for(int i=myOperators.size() -1, m=1 ;i>=0;i-- , m++){
           
                  myOperator = myOperators.get(i);
                  
-               
-                 
                  if(numOperands > 1)
-                    theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
+                    theChosenOnes(myOperator,mySearches.get(m),myNotOperands);
                  else
                      System.out.println("Not enough arguments - Exception");
                  
-                 
-              } 
+            } 
              
             if(myCandidates.isEmpty())
                 System.out.println("No results found - Exception");
@@ -184,17 +198,32 @@ public class SearchServiceDHT {
      }
         
     
-    public static void theChosenOnes(String myOperator, List<Number160> secondSearch){
-        
+    public static void theChosenOnes(String myOperator, List<Number160> secondSearch, List<List<Number160>> myNotOperands){
+                
         
         if(myOperator.equals("and")){
-            
+           
+            for(List<Number160> list : myNotOperands){
+                
+                if(list.containsAll(secondSearch)){
+                    
+                   myCandidates.removeAll(secondSearch);
+                   myNotOperands.remove(list);
+                return;
+                }
+            }
            myCandidates.retainAll(secondSearch);
             
         }
         
         if(myOperator.equals("or")){
                 
+               for(List<Number160> list : myNotOperands)
+                   if(list.equals(secondSearch)){
+                       System.out.println("throw exception!!!! - or");
+                       return;   
+                   }
+            
                 for(Number160 hash : secondSearch){
                   
                     if(!(myCandidates.contains(hash)))
@@ -203,15 +232,7 @@ public class SearchServiceDHT {
                 }
             }
         
-        if(myOperator.equals("not")){
-            for(Number160 hash : secondSearch){
-                
-                if(myCandidates.contains(hash))
-                    myCandidates.remove(hash);
-                
-            }
-            
-        }
+        
       }
     
    public static void clearMySearch(){
