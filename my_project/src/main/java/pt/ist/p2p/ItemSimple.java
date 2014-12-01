@@ -1,55 +1,60 @@
 package main.java.pt.ist.p2p;
 
-
-
 import java.io.Serializable;
-
-
-import java.io.IOException;
-import java.io.Serializable;
-
-
+import java.util.ArrayList;
 
 public class ItemSimple implements Serializable{
 
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 1L;
-
-    private String _name;
-    private String _dealer;
-    private int _idItem;
-
+    private String description;
+    private String name;
+    private ArrayList<Bid> allBidders = new ArrayList<Bid>();
+    private String dealer;
+    private boolean sold;
 
     public ItemSimple(){
+
     }
 
 
-
-    public ItemSimple(String name, String dealer, int idItem){
-         _name = name;
-         _dealer = dealer;
-         _idItem = idItem;
+    public boolean getSold(){
+        return this.sold;
     }
 
-
-    public int getIdItem(){
-        return _idItem;
+    public void setSold(boolean sold) {
+        this.sold = sold;
     }
- 
 
-   public String getName() {
-        
-        return _name;
+    public String getDealer() {
+        return dealer;
     }
-   
-   public String getDealer() {
-       
-       return _dealer;
-   }
-   
 
+    public void setDealer(String dealer) {
+        this.dealer = dealer;
+    }
 
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ArrayList<Bid> getAllBidders() {
+        return allBidders;
+    }
+
+    public void setBidder(Bid bid){
+        allBidders.add(bid);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

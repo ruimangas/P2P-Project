@@ -25,14 +25,14 @@ public class SearchServiceDHT {
  
    
    private static List<Number160> myCandidates = new ArrayList<Number160>();
-   private static Number160 domainKey = Number160.createHash("ITEMS");
+  
    
    public static List<Number160> findReference(Peer peer,String index) throws ClassNotFoundException, IOException{
        
        int counterRef = 0;
        Number160 keyKeyword = Number160.createHash(index);
        Number160 myHash;
-       FutureDHT futureGet = peer.get(keyKeyword).setDomainKey(domainKey).setAll().start();
+       FutureDHT futureGet = peer.get(keyKeyword).setAll().start();
        futureGet.awaitUninterruptibly();
        List<Number160> myReferences = new ArrayList<Number160>();
        List<Number160> myReferencesDev = new ArrayList<Number160>();
@@ -80,10 +80,10 @@ public class SearchServiceDHT {
        
        List<ItemSimple> items = new ArrayList<ItemSimple>();
        Object o;
-       
+      
         for(Number160 number: search){
             
-            FutureDHT futureGet = myPeer.get(number).setDomainKey(domainKey).setAll().start().awaitUninterruptibly();
+            FutureDHT futureGet = myPeer.get(number).setAll().start().awaitUninterruptibly();
       
             if(futureGet.isSuccess()){         
                
@@ -93,12 +93,9 @@ public class SearchServiceDHT {
                  
                    o = iteratorItem.next().getObject();
                    
-                   if(!(o.getClass().equals(number.getClass()))){
-                       
-                       
-                       items.add((ItemSimple)o);
+                   if(!(o.getClass().equals(number.getClass())))
+                      items.add((ItemSimple)o);
                    
-                   }
                    counterItem++;
                }
               counterItem = 0;
@@ -107,32 +104,7 @@ public class SearchServiceDHT {
         return items;
     }  
            
-   
-     public static List<Item> searchItem(Peer myPeer, List<ItemSimple> itemSimples) throws ClassNotFoundException, IOException{
-         
-        List<Item> items = new ArrayList<Item>();
-        Item item;
-        
-        for(ItemSimple i:itemSimples){
-            
-            Number160 keyWord = Number160.createHash(i.getIdItem());
-             
-            FutureDHT futureGet = myPeer.get(keyWord).setDomainKey(domainKey).start().awaitUninterruptibly(); 
-             
-            if(futureGet.isSuccess()){
-               
-               item = (Item)futureGet.getData().getObject();
-               items.add(item);
-            }
-        } 
-        return items;
-         
-     }
-   
-   
-   
-   
-    public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myOperands,List<String> myQuery) throws ClassNotFoundException, IOException{
+    public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myOperands) throws ClassNotFoundException, IOException{
                   
              int numOperators = myOperators.size();
              int numOperands = myOperands.size();
@@ -141,52 +113,30 @@ public class SearchServiceDHT {
              String myOperator = "";
              List<Number160> mySearch;
              List<List<Number160>> mySearches = new ArrayList<List<Number160>>();
-             List<List<Number160>> myNotOperands = new ArrayList<List<Number160>>();
-             List<String> notOperands = new ArrayList<String>();
-            
+           
              
-             if(myOperators.get(0).equals("not"))
-                 System.out.println("Failure!!!");
-             
-             for(int k=0;k<myQuery.size();k++){
-                 
-                 if(myQuery.get(k).equals("not")){
-                     notOperands.add(myQuery.get(k+1));
-                     myOperators.remove("not");
-                 }
-                 
-             }
-             
-             if(myOperands.size() - myOperators.size() != 1)
-                 System.out.println("Query Rejected!!!");
-                 
              for(int j=0;j<numOperands;j++){
                  
                  mySearch = new ArrayList<Number160>();
                  mySearch = findReference(myPeer,myOperands.get(j));
-                 
-                 if(notOperands.contains(myOperands.get(j))){
-                     myNotOperands.add(mySearch);
-                     notOperands.remove(myOperands.get(j));
-                 }
-                 
                  mySearches.add(mySearch);
                  
              }
+           
+            
+            myCandidates = mySearches.get(0);
              
-             
-          myCandidates = mySearches.get(0);
-             
-            for(int i=myOperators.size() -1, m=1 ;i>=0;i-- , m++){
+            for(int i=numOperators -1;i>=0;i--){
           
                  myOperator = myOperators.get(i);
                  
                  if(numOperands > 1)
-                    theChosenOnes(myOperator,mySearches.get(m),myNotOperands);
+                    theChosenOnes(myOperator,mySearches.get(numOperands -i -1));
                  else
                      System.out.println("Not enough arguments - Exception");
                  
-            } 
+                 
+              } 
              
             if(myCandidates.isEmpty())
                 System.out.println("No results found - Exception");
@@ -198,32 +148,17 @@ public class SearchServiceDHT {
      }
         
     
-    public static void theChosenOnes(String myOperator, List<Number160> secondSearch, List<List<Number160>> myNotOperands){
-                
+    public static void theChosenOnes(String myOperator, List<Number160> secondSearch){
+        
         
         if(myOperator.equals("and")){
-           
-            for(List<Number160> list : myNotOperands){
-                
-                if(list.containsAll(secondSearch)){
-                    
-                   myCandidates.removeAll(secondSearch);
-                   myNotOperands.remove(list);
-                return;
-                }
-            }
+            
            myCandidates.retainAll(secondSearch);
             
         }
         
         if(myOperator.equals("or")){
                 
-               for(List<Number160> list : myNotOperands)
-                   if(list.equals(secondSearch)){
-                       System.out.println("throw exception!!!! - or");
-                       return;   
-                   }
-            
                 for(Number160 hash : secondSearch){
                   
                     if(!(myCandidates.contains(hash)))
@@ -232,29 +167,23 @@ public class SearchServiceDHT {
                 }
             }
         
-        
+        if(myOperator.equals("not")){
+            for(Number160 hash : secondSearch){
+                
+                if(myCandidates.contains(hash))
+                    myCandidates.remove(hash);
+                
+            }
+            
+        }
       }
     
    public static void clearMySearch(){
        
        myCandidates.clear();
    }
-   
-   public static void listItems(List<Item> items) {
-		int i = 1;
-      System.out.println("****************** Results *********************");
-      System.out.println("************************************************");
-      
-      for (Item item : items){
-        
-          if(!item.getSold()){  
-      	   System.out.println(i+" - Name: " + item.getName() + " Dealer: " + item.getDealer());
-            i++;
-        } 
-      }
-      System.out.println("************************************************");
-      System.out.println("Press 0 to go back or press the item number to see details and bid");
-   }
+    
+
  }
         
     

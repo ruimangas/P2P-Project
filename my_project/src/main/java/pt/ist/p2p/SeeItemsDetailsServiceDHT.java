@@ -23,45 +23,33 @@ import net.tomp2p.storage.Data;
 
 
 public class SeeItemsDetailsServiceDHT {
-	
-	private static String OFFITEMS = "offeredItems";
-    
 
-	public static List<Item> getUserItems(Peer myPeer, String userName) throws ClassNotFoundException, IOException{
-		List<Item> listItems = new ArrayList<Item>();
-		FutureDHT futureGet = myPeer.get(Number160.createHash(userName)).setDomainKey(Number160.createHash(OFFITEMS)).setAll().start().awaitUninterruptibly();
-		Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
-		Object o;
-		int counterItem = 0;
-        while(counterItem < futureGet.getDataMap().size()){         
-            o = iteratorItem.next().getObject();
-            listItems.add((Item) o);
-            counterItem++;
-        }  
-		return listItems;
-	}
-	
-    public static void seeItemsDetails(Peer myPeer,Item item) throws ClassNotFoundException, IOException{
+    public static void seeItemsDetails(Peer myPeer,String nomeItem, String dealer) throws ClassNotFoundException, IOException{
         
-           System.out.println("Nome Item: "+item.getName() +  " | " + "Description: " + item.getDescription());
-           System.out.println("Bidders:");
-           BidOnItemService.getBid(myPeer, item);
-    
+        List<Number160> myReferences = new ArrayList<Number160>();
+        List<ItemSimple> myItems = new ArrayList<ItemSimple>();
+        ItemSimple myItem = null;
+        Number160 myHash;
+        myHash = Number160.createHash(nomeItem);
+        myReferences.add(myHash);
+        
+        myItems = SearchServiceDHT.search(myPeer, myReferences);
+        
+        for(ItemSimple i : myItems){
+            if(i.getDealer().equals(dealer))
+                myItem = i;
+        }
+        if(myItem.equals(null))
+            System.out.println("Send exception!!!!");
+        
+        
+        System.out.println("Title: "+myItem.getName() + " | " + "Description: "+myItem.getDescription());
+        System.out.println("Bid History: ");
+        
+        for(Bid b : myItem.getAllBidders())
+            System.out.println("Bidder: "+b.getUserID() + " | " + "Value: " +b.getBid());
     }
-    /*
-    public static Item getSpecificItem(Peer myPeer, String userName, String itemName) throws ClassNotFoundException, IOException{
-		FutureDHT futureGet = myPeer.get(Number160.createHash(userName)).setDomainKey(Number160.createHash(OFFITEMS)).setAll().start().awaitUninterruptibly();
-		Iterator<Data> iteratorItem = futureGet.getDataMap().values().iterator();
-		Object o;
-		int counterItem = 0;
-        while(counterItem < futureGet.getDataMap().size()){         
-            o = iteratorItem.next().getObject();
-            Item item = (Item) o;
-            if(item.getName().equals(itemName))
-            	return item;
-            counterItem++;
-        }  
-		return null;
-	}*/
+    
+    
     
 }
