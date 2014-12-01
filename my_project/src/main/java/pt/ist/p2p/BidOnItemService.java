@@ -59,7 +59,7 @@ public class BidOnItemService {
     		
     	    myPeer.add(locationKey).setData(new Data(bid)).setDomainKey(domainKeyBid).start().awaitUninterruptibly();
     		myPeer.add(locationKeyHistory).setData(new Data(bid)).setDomainKey(domainKeyBidHISTORY).start().awaitUninterruptibly();
-    		System.out.println(locationKey);
+    		
     		
 	    }else{
 	        
@@ -99,7 +99,7 @@ public class BidOnItemService {
 	public static void acceptBid(Peer myPeer, Item item, User u) throws IOException,
 	ClassNotFoundException {
 		Number160 userName = Number160.createHash(u.getUsername());
-		Number160 contentKey = Number160.createHash(item.getName());
+		Number160 contentKey = Number160.createHash(item.getID());
 		OfferItemServiceDHT.removeDatItem(myPeer, item);
 		myPeer.remove(userName).setContentKey(contentKey)
 			.setDomainKey(OFFITEMS).start().awaitUninterruptibly();

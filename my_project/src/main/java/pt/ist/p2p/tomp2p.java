@@ -123,6 +123,7 @@ public class tomp2p {
 					userManagement();
 					break;
 				case 0:
+				    keyboard.close();
 					peer1.shutdown();
 					return;
 				default:
@@ -192,6 +193,7 @@ public class tomp2p {
 		Scanner keyboard1 = new Scanner(System.in);
 		String s = keyboard1.nextLine();
 		String[] choice = s.split("[ ]");
+		keyboard1.close();
 		List<String> myOperators = new ArrayList<String>();
 		List<String> myOperands = new ArrayList<String>();
 		List<String> myQuery = new ArrayList<String>();
@@ -206,24 +208,17 @@ public class tomp2p {
 		}
 
 		
-		System.out.println("MyOperands: "+myOperands);
-		System.out.println("MyOperators: "+myOperators);
-		
 		try {
 
 			if (myOperators.size() == 0) {
 
 				hashSimple = new ArrayList<Number160>();
-
-				hashSimple = SearchServiceDHT.findReference(peer1,
-						myOperands.get(0));
-
-				itemSimples = SearchServiceDHT.search(peer1, hashSimple);
+                hashSimple = SearchServiceDHT.findReference(peer1,myOperands.get(0));
+                itemSimples = SearchServiceDHT.search(peer1, hashSimple);
 
 			} else {
 
-				itemSimples = SearchServiceDHT.booleanSearch(peer1,
-						myOperators, myOperands, myQuery);
+				itemSimples = SearchServiceDHT.booleanSearch(peer1,myOperators, myOperands, myQuery);
 
 			}
 		} catch (Exception e) {
@@ -356,10 +351,9 @@ public class tomp2p {
 			System.out.println("Invalid operation");
 	}
 
-	public static boolean passVerifier(Peer peer1)
-			throws ClassNotFoundException, IOException {
+	public static void passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
-		User user;
+		User user = null;
 		System.out.println("Do you have an account?");
 		Scanner keyboard1 = new Scanner(System.in);
 		String s = keyboard1.nextLine();
@@ -369,39 +363,25 @@ public class tomp2p {
 			System.out.println("User:");
 			Scanner keyboard2 = new Scanner(System.in);
 			String username = keyboard2.nextLine();
-			Number160 userKey = Number160.createHash(USERNAMES);
-			FutureDHT futureDHT = peer1.get(Number160.createHash(username)).setDomainKey(userKey).start();
-			futureDHT.awaitUninterruptibly();
-			String userName = "";
+			
 
-			if (futureDHT.isSuccess()) {
-				user = (User) futureDHT.getData().getObject();
+			try{
+            
+			    user = RegisterServiceDHT.passVerifier(peer1, username);
+                keyboard2.close();
+                u.setUsername(user.getUsername());
 
-				if (user.getUsername().equals("admin")) {
-
-					System.out.println("You are logged in as admin");
-					userName = "admin";
-
-				} else {
-
-					System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
-					System.out.println("You are logged in as "+ user.getUsername());
-					userName = user.getUsername();
-				}
-
-				u.setUsername(userName);
-				u.setBiddedItems(user.getBiddedItems());
-				return true;
-
-			} else {
-				System.out.println("User not found");
-				register();
-				return true;
-			}
-		} else
+			   }catch(NullPointerException e){
+            
+                 System.out.println("User not found");
+                 register();
+           }
+			
+	   }else{
+		    keyboard1.close();
 			register();
-
-		return false;
+		
+		}
 	}
 
 	public static void register() throws IOException {
