@@ -59,7 +59,7 @@ public class BidOnItemService {
     		
     	    myPeer.add(locationKey).setData(new Data(bid)).setDomainKey(domainKeyBid).start().awaitUninterruptibly();
     		myPeer.add(locationKeyHistory).setData(new Data(bid)).setDomainKey(domainKeyBidHISTORY).start().awaitUninterruptibly();
-    		
+    		System.out.println(locationKey);
     		
 	    }else{
 	        
@@ -96,23 +96,19 @@ public class BidOnItemService {
 		return highestBid;
 	}
   
-	public static void acceptBid(Peer myPeer, Item item, User u) throws IOException,
-	ClassNotFoundException {
-		Number160 userName = Number160.createHash(u.getUsername());
+	public static void acceptBid(Peer myPeer, Item item, User u) throws IOException, ClassNotFoundException {
+		
+	    Number160 userName = Number160.createHash(u.getUsername());
 		Number160 contentKey = Number160.createHash(item.getID());
 		OfferItemServiceDHT.removeDatItem(myPeer, item);
-		myPeer.remove(userName).setContentKey(contentKey)
-			.setDomainKey(OFFITEMS).start().awaitUninterruptibly();
+		myPeer.remove(userName).setContentKey(contentKey).setDomainKey(OFFITEMS).start().awaitUninterruptibly();
 		
 		Bid bid = BidOnItemService.getHighestBid(myPeer, item);
 		
-		Number160 locationKeyPurchase = Number160.createHash(bid
-			.getUserId());
+		Number160 locationKeyPurchase = Number160.createHash(bid.getUserId());
 		
 		item.setSoldValue(bid.getBid());
-		myPeer.add(locationKeyPurchase).setData(new Data(item))
-			.setDomainKey(PURCHASEDITEMS).start()
-			.awaitUninterruptibly();
+		myPeer.add(locationKeyPurchase).setData(new Data(item)).setDomainKey(PURCHASEDITEMS).start().awaitUninterruptibly();
 	}
 	
 	public static void listItemsWithBids(Peer myPeer, List<Item> items) {
@@ -120,8 +116,10 @@ public class BidOnItemService {
      System.out.println("****************** Results *********************");
      System.out.println("************************************************");
      for (Item item : items){
-    	 int highestBid = 0;
+    	 
+         int highestBid = 0;
     	 String bidder = "";
+    	 
     	 try {
     		Bid bid = getHighestBid(myPeer, item);
 			highestBid = bid.getBid();
@@ -133,7 +131,7 @@ public class BidOnItemService {
 			 if(highestBid>0)
 				 System.out.println(i+" - Item Name: " + item.getName() + " | CurrentBid: " + highestBid + " | CurrentBidder: " + bidder);
 			 else
-				 System.out.println(i+" - Item Name: " + item.getName() + " | This item have no bids");
+				 System.out.println(i+" - Item Name: " + item.getName() + " | This item has no bids");
 			 i++;
        } 
      }

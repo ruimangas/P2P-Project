@@ -14,10 +14,12 @@ import net.tomp2p.futures.FutureDiscover;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
 import net.tomp2p.peers.Number160;
+import net.tomp2p.peers.Number480;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.Gossip;
+import static main.java.pt.ist.p2p.tomp2p.getGossip;
 
 public class tomp2p {
 
@@ -122,6 +124,9 @@ public class tomp2p {
 				case 5:
 					userManagement();
 					break;
+				case 6:
+				    printStorage();
+				    break;
 				case 0:
 				    keyboard.close();
 					peer1.shutdown();
@@ -134,6 +139,35 @@ public class tomp2p {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+	}
+
+	public static  void printStorage(){
+
+	    System.out.println("tamanho: " + peer1.getPeerBean().getPeerMap().getAll().size());
+
+	    Map<Number480, Data> map = peer1.getPeerBean().getStorage().map();
+	    for (Object o : map.entrySet()) {
+	        Map.Entry thisEntry = (Map.Entry) o;
+	        Object value = thisEntry.getValue();
+	        Data data = (Data) value;
+
+	        try {
+	            if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.ItemSimple")) {
+	                ItemSimple it = (ItemSimple) data.getObject();
+	                System.out.println(it.getName());
+	            }
+	            if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.User")) {
+	                User u = (User) data.getObject();
+	                System.out.println(u.getUsername());
+
+	            }
+
+	        } catch (ClassNotFoundException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
 
 	public static void showItemMenu() {
@@ -208,17 +242,23 @@ public class tomp2p {
 		}
 
 		
+		
+		
 		try {
 
 			if (myOperators.size() == 0) {
 
 				hashSimple = new ArrayList<Number160>();
-                hashSimple = SearchServiceDHT.findReference(peer1,myOperands.get(0));
-                itemSimples = SearchServiceDHT.search(peer1, hashSimple);
+
+				hashSimple = SearchServiceDHT.findReference(peer1,
+						myOperands.get(0));
+
+				itemSimples = SearchServiceDHT.search(peer1, hashSimple);
 
 			} else {
 
-				itemSimples = SearchServiceDHT.booleanSearch(peer1,myOperators, myOperands, myQuery);
+				itemSimples = SearchServiceDHT.booleanSearch(peer1,
+						myOperators, myOperands, myQuery);
 
 			}
 		} catch (Exception e) {
@@ -316,74 +356,52 @@ public class tomp2p {
 		HistoryServiceDHT.getHistory(peer1, u.getUsername());
 	}
 	
-/*	public static void showItemDetails() throws ClassNotFoundException, IOException {
-		Scanner input = new Scanner(System.in);
 
-		System.out.println("Please, enter the name of the item:");
-		String itemTitle = input.nextLine();
+	public static void userManagement(){
 
-		System.out.println("Please, enter the dealer name:");
-		String dealer = input.nextLine();
-		try {		
-			Item item = SeeItemsDetailsServiceDHT.getSpecificItem(peer1, dealer, itemTitle);
-			SeeItemsDetailsServiceDHT.seeItemsDetails(peer1, item);
-		} catch (Exception e) {
-			System.out.println("There is no item with that parameters");
-			//System.out.println(e.getMessage());
-		}
+	    if(u.getUsername().equals("admin")){
 
-	}
-	*/
-	public static void userManagement() {
+	        System.out.println("There are " + Math.round(getGossip().calculateNumberNodes(MessageType.NODES_SUM)) + " nodes.");
+	        System.out.println("There are " + Math.round(getGossip().calculateNumberItems(MessageType.ITEMS_SUM))  + " items.");
+	        System.out.println("There are " + Math.round(getGossip().calculateNumerUsers(MessageType.USERS_SUM))  + " Users.");
 
-		if (u.getUsername().equals("admin")) {
+	    }
 
-			System.out.println("There are "
-					+ Math.round(getGossip().calculateNumberNodes(
-							MessageType.NODES_SUM)) + " nodes.");
-			System.out.println("There are "
-					+ Math.round(getGossip().calculateNumberItems(
-							MessageType.ITEMS_SUM)) + " files.");
-			System.out.println("There are " + allUsers.size() + " users.");
-		}
-
-		else
-			System.out.println("Invalid operation");
+	    else System.out.println("Invalid operation");
 	}
 
 	public static void passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
-		User user = null;
-		System.out.println("Do you have an account?");
-		Scanner keyboard1 = new Scanner(System.in);
-		String s = keyboard1.nextLine();
+	    User user = null;
+        System.out.println("Do you have an account?");
+        Scanner keyboard1 = new Scanner(System.in);
+        String s = keyboard1.nextLine();
 
-		if (s.equals("yes") || s.equals("y")) {
+        if (s.equals("yes") || s.equals("y")) {
 
-			System.out.println("User:");
-			Scanner keyboard2 = new Scanner(System.in);
-			String username = keyboard2.nextLine();
-			
-
-			try{
+            System.out.println("User:");
+            Scanner keyboard2 = new Scanner(System.in);
+            String username = keyboard2.nextLine();
             
-			    user = RegisterServiceDHT.passVerifier(peer1, username);
+
+            try{
+            
+                user = RegisterServiceDHT.passVerifier(peer1, username);
                 keyboard2.close();
                 u.setUsername(user.getUsername());
 
-			   }catch(NullPointerException e){
+               }catch(NullPointerException e){
             
                  System.out.println("User not found");
                  register();
            }
-			
-	   }else{
-		    keyboard1.close();
-			register();
-		
-		}
+            
+       }else{
+            keyboard1.close();
+            register();
 	}
-
+}
+	
 	public static void register() throws IOException {
 
 		System.out.println("Register Menu");
@@ -408,144 +426,27 @@ public class tomp2p {
      }
 	
 
-	public static Gossip getGossip() {
-		return gossip;
-	}
+     public static Gossip getGossip() {
+         return gossip;
+     }
 
-	public void sendMessages(MessageType mType, int i) throws IOException {
+     public Peer getPeer1() { return peer1; }
 
-		List<PeerAddress> listaPeers = peer1.getPeerBean().getPeerMap()
-				.getAll();
+     public User getU() { return u; }
 
-		List<PeerAddress> arrayPeer = new ArrayList<PeerAddress>();
-
-		for (PeerAddress pa : listaPeers) {
-			if (!(pa.getID().equals(new Number160(1)))) {
-				arrayPeer.add(pa);
-			}
-		}
-
-		if (!arrayPeer.isEmpty()) {
-
-			int in = arrayPeer.size();
-			PeerAddress peerAddress = arrayPeer.get(new Random().nextInt(in));
-
-			if (u.getUsername().equals("admin") && i % 50 == 0) {
-
-				getGossip().resetGossipNodes();
-				getGossip().resetGossipFiles();
-				getGossip().incrementMesg();
-
-			}
-
-			if (getGossip().getNodesWeightValue() > 0
-					&& getGossip().getNumItemsWeight() > 0) {
-				Message msg = getGossip().getMessage(mType);
-				peer1.sendDirect(peerAddress).setObject(msg).start();
-			}
-
-		} else {
-
-			if (u.getUsername().equals("admin") && i % 50 == 0) {
-
-				getGossip().resetGossipNodes();
-				getGossip().resetGossipFiles();
-				getGossip().incrementMesg();
-
-			}
-
-			Message msg = getGossip().getMessage(mType);
-			peer1.sendDirect(peer1.getPeerAddress()).setObject(msg).start();
-		}
-
-	}
-
-	public void activeUser() {
-
-		String activeUser = u.getUsername();
-		String myKey = "activeUsers";
-		FutureDHT futureDHT;
-
-		try {
-			futureDHT = peer1.add(Number160.createHash(myKey))
-					.setData(new Data(activeUser)).start();
-			futureDHT.awaitUninterruptibly();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void countUsers(int i) {
-
-		if (i % 30 == 0) {
-
-			FutureDHT futureDHT;
-			futureDHT = peer1.get(Number160.createHash("activeUsers")).setAll()
-					.start();
-			futureDHT.awaitUninterruptibly();
-			Iterator<Data> iterator = futureDHT.getDataMap().values()
-					.iterator();
-			while (iterator.hasNext()) {
-				try {
-					String userName = (String) iterator.next().getObject();
-
-					if (!allUsers.contains(userName)) {
-						allUsers.add(userName);
-					}
-
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public static void setGossipValues() {
-
-		if (u.getUsername().equals("admin")) {
-			getGossip().init(1, 1);
-			getGossip().initFiles(new tomp2p().getActualNumberFiles(), 1);
-		} else {
-			getGossip().init(1, 0);
-			getGossip().initFiles(new tomp2p().getActualNumberFiles(), 0);
-		}
-	}
-
-	public static void main(String[] args) throws ClassNotFoundException,
-			IOException {
+	public static void main(String[] args) throws ClassNotFoundException, IOException {
 
 		tomp2p tom = new tomp2p();
 
 		Peer p = tomp2p.PeerBuilder(args[0]);
 
 		passVerifier(p);
-		tom.activeUser();
-		setGossipValues();
-		setupReplyHandler(p);
-		new countUsers(tom).start();
+		GossipService.setGossipValues(u,getGossip(),peer1);
+		GossipService.setupReplyHandler(peer1, getGossip());
 		new sendThread(tom).start();
 		tomp2p.comandLine();
 
 	}
-
-	private static void setupReplyHandler(Peer peer1) {
-		final Peer p = peer1;
-
-		p.setObjectDataReply(new ObjectDataReply() {
-			@Override
-			public Object reply(PeerAddress sender, Object request)
-					throws Exception {
-
-				Message m = (Message) request;
-				getGossip().handleMsg(m);
-				return null;
-
-			}
-		});
-	}
-
 }
 
 class sendThread extends Thread {
@@ -553,46 +454,25 @@ class sendThread extends Thread {
 	tomp2p sv;
 	int i = 0;
 
-	public sendThread(tomp2p sv) {
+	public sendThread(tomp2p sv){
 		this.sv = sv;
 	}
 
 	@Override
 	public void run() {
-		try {
-			while (true) {
+		try{
+			while (true){
 				Thread.sleep(ONE_SECOND);
-				sv.sendMessages(MessageType.NODES_SUM, i);
-				sv.sendMessages(MessageType.ITEMS_SUM, i);
+				GossipService.sendMessages(MessageType.NODES_SUM, i, sv.getPeer1(), getGossip(), sv.getU());
+				GossipService.sendMessages(MessageType.ITEMS_SUM, i, sv.getPeer1(), getGossip(), sv.getU());
+				GossipService.sendMessages(MessageType.USERS_SUM, i, sv.getPeer1(), getGossip(), sv.getU());
 				i++;
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-}
-
-class countUsers extends Thread {
-	final int ONE_SECOND = 1000;
-	tomp2p sv;
-	int i = 0;
-
-	public countUsers(tomp2p sv) {
-		this.sv = sv;
-	}
-
-	@Override
-	public void run() {
-
-		try {
-			while (true) {
-				Thread.sleep(ONE_SECOND);
-				sv.countUsers(i);
-				i++;
-			}
-		} catch (InterruptedException e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

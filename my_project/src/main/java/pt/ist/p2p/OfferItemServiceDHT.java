@@ -64,8 +64,7 @@ public class OfferItemServiceDHT {
             }
         }
         
-        myPeer.put(userName).setData(contentKey, new Data(item))
-		.setDomainKey(domainKeyOffer).start().awaitUninterruptibly();
+        myPeer.put(userName).setData(contentKey, new Data(item)).setDomainKey(domainKeyOffer).start().awaitUninterruptibly();
 
        
     }
