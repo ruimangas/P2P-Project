@@ -410,34 +410,26 @@ public class tomp2p {
 	public static void register() throws IOException {
 
 		System.out.println("Register Menu");
-
+		Scanner keyboard1 = new Scanner(System.in);
+		
 		while (true) {
 
 			System.out.println("Username:");
 
-			Scanner keyboard1 = new Scanner(System.in);
 			String username = keyboard1.nextLine();
-			Number160 userKey = Number160.createHash(USERNAMES);
-			FutureDHT futureDHT = peer1.get(Number160.createHash(username))
-					.setDomainKey(userKey).start();
-			futureDHT.awaitUninterruptibly();
-
-			if (futureDHT.isSuccess()) {
-				System.out
-						.println("user already exists. Please choose another username");
-
-			} else {
-				u.setUsername(username);
-				System.out.println(userKey);
-				System.out.println(Number160.createHash(username));
-
-				peer1.put(Number160.createHash(username)).setData(new Data(u))
-						.setDomainKey(userKey).start().awaitUninterruptibly();
-				System.out.println("you are logged in as " + u.getUsername());
-				break;
+            
+			if(!RegisterServiceDHT.userExists(peer1, username)){
+				
+    			u.setUsername(username);
+    			RegisterServiceDHT.register(peer1, username, u);
+    		    System.out.println("you are logged in as " + u.getUsername());
+    		    keyboard1.close();
+    		    break;
+		    
 			}
 		}
-	}
+     }
+	
 
 	public static Gossip getGossip() {
 		return gossip;

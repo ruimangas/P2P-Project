@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.util.*;
 import java.io.*;
 
+import main.java.pt.ist.p2p.exception.QueryRejectedException;
+import main.java.pt.ist.p2p.exception.ResultsNotFoundException;
 import net.tomp2p.connection.Bindings;
 import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureBootstrap;
@@ -134,7 +136,7 @@ public class SearchServiceDHT {
    
     public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myOperands,List<String> myQuery) throws ClassNotFoundException, IOException{
                   
-             int numOperators = myOperators.size();
+            
              int numOperands = myOperands.size();
              List<ItemSimple> theOnes = new ArrayList<ItemSimple>();
            
@@ -146,7 +148,7 @@ public class SearchServiceDHT {
             
              
              if(myOperators.get(0).equals("not"))
-                 System.out.println("Failure!!!");
+                 throw new QueryRejectedException();
              
              for(int k=0;k<myQuery.size();k++){
                  
@@ -158,7 +160,7 @@ public class SearchServiceDHT {
              }
              
              if(myOperands.size() - myOperators.size() != 1)
-                 System.out.println("Query Rejected!!!");
+                 throw new QueryRejectedException();
                  
              for(int j=0;j<numOperands;j++){
                  
@@ -184,12 +186,12 @@ public class SearchServiceDHT {
                  if(numOperands > 1)
                     theChosenOnes(myOperator,mySearches.get(m),myNotOperands);
                  else
-                     System.out.println("Not enough arguments - Exception");
+                     throw new QueryRejectedException();
                  
             } 
              
             if(myCandidates.isEmpty())
-                System.out.println("No results found - Exception");
+                throw new ResultsNotFoundException();
                
            theOnes = search(myPeer,myCandidates);   
            
@@ -219,10 +221,10 @@ public class SearchServiceDHT {
         if(myOperator.equals("or")){
                 
                for(List<Number160> list : myNotOperands)
-                   if(list.equals(secondSearch)){
-                       System.out.println("throw exception!!!! - or");
-                       return;   
-                   }
+                   if(list.equals(secondSearch))
+                       throw new QueryRejectedException();
+                          
+                   
             
                 for(Number160 hash : secondSearch){
                   
