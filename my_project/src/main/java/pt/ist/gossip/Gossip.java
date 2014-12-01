@@ -39,8 +39,6 @@ public class Gossip {
 
         int s = new tomp2p().getPeer1().getPeerBean().getPeerMap().getAll().size();
 
-        System.out.println("TAMNHO: " + s);
-
         if(s<5){
             replicationFactor = s+1;
         }

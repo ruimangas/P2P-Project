@@ -55,7 +55,7 @@ public class masterPeer {
 
         try{
 
-            peerMaster = new PeerMaker(id).setTcpPort(10001).setUdpPort(10001).setBindings(b).makeAndListen();
+            peerMaster = new PeerMaker(id).setTcpPort(10001).setUdpPort(10001).setEnableIndirectReplication(true).setBindings(b).makeAndListen();
             peerMaster.getConfiguration().setBehindFirewall(true);
 
         }catch(Exception e){
@@ -77,8 +77,7 @@ public class masterPeer {
 
         while(true) {
 
-            int i=0;
-            int j=0;
+/*            System.out.println("tamanho: " + peerMaster.getPeerBean().getPeerMap().getAll().size());
 
             Map<Number480, Data> map = peerMaster.getPeerBean().getStorage().map();
             for (Object o : map.entrySet()) {
@@ -88,10 +87,13 @@ public class masterPeer {
 
                 try {
                     if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.ItemSimple")) {
-                        i++;
+                        ItemSimple it = (ItemSimple) data.getObject();
+                        System.out.println(it.getName());
                     }
                     if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.User")) {
-                        j++;
+                        User u = (User) data.getObject();
+                        System.out.println(u.getUsername());
+
                     }
 
                 } catch (ClassNotFoundException e) {
@@ -101,8 +103,7 @@ public class masterPeer {
                 }
             }
 
-            System.out.println(i + "files");
-            System.out.println(j + "users");
+            System.out.println("---------------------------------------");*/
 
             try {
                 Thread.sleep(5000);
@@ -110,7 +111,7 @@ public class masterPeer {
                 e.printStackTrace();
             }
 
-           //System.out.println("my peers:" + peerMaster.getPeerBean().getPeerMap().getAll());
+           System.out.println("my peers:" + peerMaster.getPeerBean().getPeerMap().getAll());
         }
     }
 }

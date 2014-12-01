@@ -42,7 +42,7 @@ public class tomp2p {
         Random random = new Random();
         Bindings bindings = new Bindings();
 
-        peer1 = new PeerMaker(new Number160(random)).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setEnableIndirectReplication(true).setBindings(bindings).makeAndListen();
+        peer1 = new PeerMaker(new Number160(random.nextInt())).setTcpPort(Integer.parseInt(port)).setUdpPort(Integer.parseInt(port)).setEnableIndirectReplication(true).setBindings(bindings).makeAndListen();
 
         InetAddress address = Inet4Address.getByName("194.210.222.69");
 
@@ -117,8 +117,7 @@ public class tomp2p {
 
     public static  void printStorage(){
 
-        int i=0;
-        int j=0;
+        System.out.println("tamanho: " + peer1.getPeerBean().getPeerMap().getAll().size());
 
         Map<Number480, Data> map = peer1.getPeerBean().getStorage().map();
         for (Object o : map.entrySet()) {
@@ -128,10 +127,13 @@ public class tomp2p {
 
             try {
                 if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.ItemSimple")) {
-                    i++;
+                    ItemSimple it = (ItemSimple) data.getObject();
+                    System.out.println(it.getName());
                 }
                 if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.User")) {
-                    j++;
+                    User u = (User) data.getObject();
+                    System.out.println(u.getUsername());
+
                 }
 
             } catch (ClassNotFoundException e) {
@@ -140,10 +142,6 @@ public class tomp2p {
                 e.printStackTrace();
             }
         }
-
-        System.out.println(i + "files");
-        System.out.println(j + "users");
-
     }
 
 

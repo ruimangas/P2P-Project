@@ -13,21 +13,19 @@ public class StorageService {
         int activeStuff = 0;
 
         Map<Number480, Data> map = peer.getPeerBean().getStorage().map();
-        if (map!=null) {
-            for (Object o : map.entrySet()) {
-                Map.Entry thisEntry = (Map.Entry) o;
-                Object value = thisEntry.getValue();
-                Data data = (Data) value;
 
-                try {
-                    if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p." + className)) {
-                        activeStuff++;
-                    }
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        for (Object value : map.values()) {
+
+            Data data = (Data) value;
+
+            try {
+                if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p." + className)) {
+                    activeStuff++;
                 }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 

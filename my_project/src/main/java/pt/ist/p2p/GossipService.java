@@ -18,12 +18,12 @@ public class GossipService {
     public static void setGossipValues(User u, Gossip g, Peer p) throws IOException, ClassNotFoundException {
 
         if(u.getUsername().equals("admin")){
-            g.init(1,1);
+            g.init(1, 1);
             g.initFiles(StorageService.countStoredStuff("ItemSimple", p), 1);
             g.initUsers(StorageService.countStoredStuff("User", p), 1);
         }
         else{
-            g.init(1,0);
+            g.init(1, 0);
             g.initFiles(StorageService.countStoredStuff("ItemSimple", p), 0);
             g.initUsers(StorageService.countStoredStuff("User", p), 0);
         }
@@ -33,7 +33,7 @@ public class GossipService {
 
         List<PeerAddress> listaPeers = peer.getPeerBean().getPeerMap().getAll();
 
-        if (!listaPeers.isEmpty()) {
+        if (listaPeers.size()>0) {
 
             int in = listaPeers.size();
             PeerAddress peerAddress = listaPeers.get(new Random().nextInt(in));
@@ -47,7 +47,7 @@ public class GossipService {
 
             }
 
-            if (gossip.getNodesWeightValue()>0 && gossip.getNumItemsWeight()>0 && gossip.getNumUsersWeight()>0) {
+            if (gossip.getNodesWeightValue()>0) {
                 Message msg = gossip.getMessage(mType);
                 peer.sendDirect(peerAddress).setObject(msg).start();
             }
