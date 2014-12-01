@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Rest" default="compile" basedir=".">
+  <description>Project Build File</description>
+  
+  <property name="ant.build.javac.source" value="1.6"/>
+  <property name="ant.build.javac.target" value="1.6"/>
+
+  <property name="javac.encoding" value="UTF-8"/>
+  <property name="java.file.encoding" value="UTF-8"/>
+  
+  <property name="src.rel-dir" value="src"/>
+  <property name="build.rel-dir" value="build"/>
+  <property name="lib.rel-dir" value="../my_project/lib"/>
+  
+  <property name="main.src.rel-dir" value="${src.rel-dir}/main"/>
+  
+  
+  
+  <property name="java.main.src.rel-dir" value="${main.src.rel-dir}/java"/>
+  <property name="classes.build.rel-dir" value="${build.rel-dir}/classes"/>
+  
+  
+  
+  
+
+  <path id="project.classpath">
+  	<pathelement location="${classes.build.rel-dir}" />
+  	<fileset dir="${lib.rel-dir}">
+  		<include name="**/*.jar" />
+  	</fileset>
+  </path>
+  
+  
+  
+  <target name="prepare">
+    <echo message="Preparing the project for build..."/>
+    <mkdir dir="${classes.build.rel-dir}"/>
+  </target>
+  
+  
+  <target name="compile-domain" depends="prepare">
+    <echo message="Compiling sources..." />
+    <javac destdir="${classes.build.rel-dir}" debug="true" debuglevel="lines,vars,source"
+           optimize="true" deprecation="true" verbose="false" includeantruntime="false">
+      <classpath refid="project.classpath" />
+      <src>
+        <pathelement path="${java.main.src.rel-dir}"/>
+      </src>
+      <compilerarg line=""/>
+    </javac> 
+  </target>
+  
+
+
+  <target name="compile" depends="prepare">
+    <echo message="Compiling sources..." />
+    <javac destdir="build/classes" debug="true" debuglevel="lines,vars,source"
+           optimize="true" deprecation="true" verbose="false" includeantruntime="false">
+      <classpath refid="project.classpath" />
+      <src>
+        <pathelement path="${java.main.src.rel-dir}"/>
+      </src>
+      <compilerarg line=""/>
+    </javac> 
+  </target>
+
+  
+  <target name="run" depends="compile" description="Runs the program">
+    <java classname="main.java.pt.ist.p2p.ExampleSimple" fork="no">
+    	<arg value="${arg0}" />
+    	<arg value="${arg1}" />
+    	<arg value="${arg2}" />
+	  <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+	</java>
+  </target>
+	
+	<target name="runTom" depends="compile" description="Runs the program">
+		    <java classname="main.java.pt.ist.p2p.tomp2p" fork="no">
+		    	<arg value="${arg0}" />
+			  <classpath>
+			    <path refid="project.classpath" />
+			  </classpath>
+			</java>
+		  </target>
+	
+	
+	
+	
+	
+	<target name="runMaster" depends="compile" description="Runs the program">
+	    <java classname="main.java.pt.ist.p2p.masterPeer" fork="no">
+		  <classpath>
+		    <path refid="project.classpath" />
+		  </classpath>
+		</java>
+	  </target>
+  
+  <target name="clean" description="Cleans the compiled classes and generated sources">
+    <delete dir="${build.rel-dir}"/>
+  </target>
+
+</project>
