@@ -49,10 +49,34 @@ public class RegisterServiceDHT {
         
     }
     
-    public static void passVerifier(){
+    public static String passVerifier(Peer peer1, String username) throws ClassNotFoundException, IOException{
+        
+        User user;
+        Number160 userKey = Number160.createHash(USERNAMES);
+        FutureDHT futureDHT = peer1.get(Number160.createHash(username)).setDomainKey(userKey).start();
+        futureDHT.awaitUninterruptibly();
+        String userName = "";
+
+        if (futureDHT.isSuccess()) {
+            user = (User) futureDHT.getData().getObject();
+
+            if (user.getUsername().equals("admin")) {
+
+                System.out.println("You are logged in as admin");
+                userName = "admin";
+
+            } else {
+
+                System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
+                System.out.println("You are logged in as "+ user.getUsername());
+                userName = user.getUsername();
+            }
+
+        
+        
         
     }
     
-    
-    
+   return userName; 
+  }
 }

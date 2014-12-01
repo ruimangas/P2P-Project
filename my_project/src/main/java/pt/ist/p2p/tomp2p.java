@@ -370,8 +370,7 @@ public class tomp2p {
 			Scanner keyboard2 = new Scanner(System.in);
 			String username = keyboard2.nextLine();
 			Number160 userKey = Number160.createHash(USERNAMES);
-			FutureDHT futureDHT = peer1.get(Number160.createHash(username))
-					.setDomainKey(userKey).start();
+			FutureDHT futureDHT = peer1.get(Number160.createHash(username)).setDomainKey(userKey).start();
 			futureDHT.awaitUninterruptibly();
 			String userName = "";
 
@@ -385,10 +384,8 @@ public class tomp2p {
 
 				} else {
 
-					System.out
-							.println("******** WELCOME TO TOMP2P AUCTIONS ********");
-					System.out.println("You are logged in as "
-							+ user.getUsername());
+					System.out.println("******** WELCOME TO TOMP2P AUCTIONS ********");
+					System.out.println("You are logged in as "+ user.getUsername());
 					userName = user.getUsername();
 				}
 
