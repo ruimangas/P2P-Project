@@ -176,8 +176,7 @@ public class SearchServiceDHT {
                  
              }
              
-             if(mySearches.isEmpty())
-                 throw new ResultsNotFoundException();
+             
              
           myCandidates = mySearches.get(0);
              
