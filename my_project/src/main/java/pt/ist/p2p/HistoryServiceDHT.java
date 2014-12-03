@@ -37,7 +37,7 @@ public class HistoryServiceDHT {
 		
 		Iterator<Data> iteratorItemsBidded = futureGetBidded.getDataMap().values().iterator();
 		Iterator<Data> iteratorItemsPurchased = futureGetPurchased.getDataMap().values().iterator();
-		
+
 		Object o;
 		
 		int counterItem = 0;

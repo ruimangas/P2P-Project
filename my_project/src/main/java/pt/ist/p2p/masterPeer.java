@@ -37,8 +37,8 @@ public class masterPeer {
     public static void setGossipValues() throws IOException, ClassNotFoundException {
 
        getGossip().init(1,0);
-       getGossip().initFiles(StorageService.countStoredStuff("ItemSimple", peerMaster), 0);
-       getGossip().initUsers(StorageService.countStoredStuff("User", peerMaster), 0);
+       getGossip().initFiles(StorageService.countStoredStuff("ItemSimple",peerMaster), 0);
+       getGossip().initUsers(StorageService.countStoredStuff("User",peerMaster), 0);
     }
 
     public static Gossip getGossip() {
@@ -76,34 +76,6 @@ public class masterPeer {
 
 
         while(true) {
-
-/*            System.out.println("tamanho: " + peerMaster.getPeerBean().getPeerMap().getAll().size());
-
-            Map<Number480, Data> map = peerMaster.getPeerBean().getStorage().map();
-            for (Object o : map.entrySet()) {
-                Map.Entry thisEntry = (Map.Entry) o;
-                Object value = thisEntry.getValue();
-                Data data = (Data) value;
-
-                try {
-                    if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.ItemSimple")) {
-                        ItemSimple it = (ItemSimple) data.getObject();
-                        System.out.println(it.getName());
-                    }
-                    if (data.getObject().getClass().getName().equals("main.java.pt.ist.p2p.User")) {
-                        User u = (User) data.getObject();
-                        System.out.println(u.getUsername());
-
-                    }
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            System.out.println("---------------------------------------");*/
 
             try {
                 Thread.sleep(5000);

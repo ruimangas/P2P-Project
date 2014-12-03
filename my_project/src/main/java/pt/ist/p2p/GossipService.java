@@ -38,7 +38,7 @@ public class GossipService {
             int in = listaPeers.size();
             PeerAddress peerAddress = listaPeers.get(new Random().nextInt(in));
 
-            if(u.getUsername()!= null && u.getUsername().equals("admin") && i%50==0){
+            if(u.getUsername()!= null && u.getUsername().equals("admin") && i%30==0){
 
                 gossip.resetGossipNodes();
                 gossip.resetGossipFiles(peer);
