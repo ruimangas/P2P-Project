@@ -47,7 +47,6 @@ public class OfferItemServiceDHT {
         Number160 searchKey = Number160.createHash(myTitle);
         
         
-        System.out.println(searchKey);
         FutureDHT futurePutItemSimple = myPeer.add(searchKey).setData(new Data(itemSimple)).setDomainKey(domainKey).start();
       
         futurePutItemSimple.awaitUninterruptibly(); 

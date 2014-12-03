@@ -28,6 +28,7 @@ public class SearchServiceDHT {
    
    private static List<Number160> myCandidates = new ArrayList<Number160>();
    private static Number160 domainKey = Number160.createHash("ITEMS");
+   private static List<Number160> myInitialSearch;
    
    public static List<Number160> findReference(Peer peer,String index) throws ClassNotFoundException, IOException{
        
@@ -177,8 +178,11 @@ public class SearchServiceDHT {
              }
              
              
-          myCandidates = mySearches.get(0);
-             
+         
+          myInitialSearch = mySearches.get(0);
+          
+          myCandidates = myInitialSearch;
+          
             for(int i=myOperators.size() -1, m=1 ;i>=0;i-- , m++){
           
                  myOperator = myOperators.get(i);
@@ -205,31 +209,46 @@ public class SearchServiceDHT {
         
         if(myOperator.equals("and")){
            
-            for(List<Number160> list : myNotOperands){
-                
-                if(list.containsAll(secondSearch)){
-                    
-                   myCandidates.removeAll(secondSearch);
-                   myNotOperands.remove(list);
-                return;
-                }
-            }
-           myCandidates.retainAll(secondSearch);
+            if(myNotOperands.contains(secondSearch) && myNotOperands.contains(myInitialSearch))
+                throw new QueryRejectedException();
             
-        }
+            
+              
+            
+            for(List<Number160> list : myNotOperands){
+
+                if(list.containsAll(secondSearch)){
+
+                    myCandidates.removeAll(secondSearch);
+                    myNotOperands.remove(list);
+                    return;
+                }
+                
+                if(list.containsAll(myInitialSearch)){
+
+                    myCandidates = secondSearch;
+                    myCandidates.removeAll(list);
+                    myInitialSearch.clear();
+                    return;
+                }
+
+            }
+            
+            
+           myCandidates.retainAll(secondSearch);
+        }    
+        
         
         if(myOperator.equals("or")){
                 
-               for(List<Number160> list : myNotOperands)
-                   if(list.equals(secondSearch))
-                       throw new QueryRejectedException();
-                          
-                   
+            if(myNotOperands.contains(myInitialSearch) || myNotOperands.contains(secondSearch))
+               throw new QueryRejectedException();
             
-                for(Number160 hash : secondSearch){
-                  
-                    if(!(myCandidates.contains(hash)))
-                        myCandidates.add(hash);
+            
+                   
+            for(Number160 hash : secondSearch){
+                  if(!(myCandidates.contains(hash)))
+                      myCandidates.add(hash);
                     
                 }
             }

@@ -29,15 +29,9 @@ public class tomp2p {
 
 	private static Random rnd = new Random();
 
-	private static String USERNAMES = "username";
-
-	private static String OFFITEMS = "offeredItems";
-
-	private static String PURCHASEDITEMS = "purchasedItems";
-
 	private static Gossip gossip = new Gossip();
 
-	private static ArrayList<String> allUsers = new ArrayList<String>();
+	
 
 	public tomp2p() {
 
@@ -248,26 +242,29 @@ public class tomp2p {
 		
 		try {
 
-			if (myOperators.size() == 0) {
+		    if (myOperators.size() == 0) {
 
-				hashSimple = new ArrayList<Number160>();
+		        hashSimple = new ArrayList<Number160>();
 
-				hashSimple = SearchServiceDHT.findReference(peer1,
-						myOperands.get(0));
+		        hashSimple = SearchServiceDHT.findReference(peer1,
+		                myOperands.get(0));
 
-				itemSimples = SearchServiceDHT.search(peer1, hashSimple);
+		        itemSimples = SearchServiceDHT.search(peer1, hashSimple);
 
-			} else {
+		    } else {
 
-				itemSimples = SearchServiceDHT.booleanSearch(peer1,
-						myOperators, myOperands, myQuery);
+		        itemSimples = SearchServiceDHT.booleanSearch(peer1,
+		                myOperators, myOperands, myQuery);
 
-			}
+		    }
+		    items = SearchServiceDHT.searchItem(peer1, itemSimples);
+
+
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+		    System.out.println(e.toString());
+		    return;
 
-		items = SearchServiceDHT.searchItem(peer1, itemSimples);
+		}
 
 		SearchServiceDHT.listItems(items);
 		SearchServiceDHT.clearMySearch();
@@ -384,7 +381,8 @@ public class tomp2p {
             System.out.println("User:");
             Scanner keyboard2 = new Scanner(System.in);
             String username = keyboard2.nextLine();
-            
+            System.out.println("Pass:");
+            String pass = keyboard2.nextLine();
 
             try{
             
@@ -415,6 +413,8 @@ public class tomp2p {
 
 			String username = keyboard1.nextLine();
             
+			System.out.println("Password:");
+			String pass = keyboard1.nextLine();;
 			if(!RegisterServiceDHT.userExists(peer1, username)){
 				
     			u.setUsername(username);
