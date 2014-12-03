@@ -3,6 +3,7 @@ package main.java.pt.ist.p2p;
 import main.java.pt.ist.gossip.Gossip;
 import main.java.pt.ist.gossip.Message;
 import main.java.pt.ist.gossip.MessageType;
+import main.java.pt.ist.gossip.loggingService;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
@@ -10,6 +11,7 @@ import net.tomp2p.rpc.ObjectDataReply;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 

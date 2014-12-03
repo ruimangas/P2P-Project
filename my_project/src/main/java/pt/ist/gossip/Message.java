@@ -1,6 +1,8 @@
 package main.java.pt.ist.gossip;
 
+import java.io.IOException;
 import java.io.Serializable;
+
 
 public class Message implements Serializable{
 
@@ -18,6 +20,7 @@ public class Message implements Serializable{
     }
 
     public Message(MessageType mType, double value, double weight, double id){
+
 
         this.mType = mType;
         this.value = value;
@@ -41,4 +44,5 @@ public class Message implements Serializable{
     public MessageType getmType() {
         return mType;
     }
+
 }

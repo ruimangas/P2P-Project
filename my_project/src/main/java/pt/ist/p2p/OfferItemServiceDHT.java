@@ -21,11 +21,6 @@ import net.tomp2p.replication.Replication;
 import net.tomp2p.rpc.DirectDataRPC;
 import net.tomp2p.storage.Data;
 
-
-
-
-
-
 public class OfferItemServiceDHT {
 
     

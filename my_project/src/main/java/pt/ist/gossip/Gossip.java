@@ -5,6 +5,7 @@ import main.java.pt.ist.p2p.masterPeer;
 import main.java.pt.ist.p2p.tomp2p;
 
 import java.io.*;
+import java.util.Date;
 
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.replication.ReplicationExecutor;
@@ -99,10 +100,12 @@ public class Gossip {
         this.messageId = this.messageId + 1;
     }
 
-    public synchronized void process(Message msg){
+    public synchronized void process(Message msg) throws IOException {
 
 
         if(msg.getmType().toString().equals("NODES_SUM")) {
+
+            loggingService.log(String.valueOf(Math.round(msg.getValue()/msg.getWeight())), new Date());
 
             this.nodesSumValue = this.nodesSumValue + msg.getValue();
             this.nodesWeightValue = this.nodesWeightValue + msg.getWeight();

@@ -19,6 +19,8 @@ import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.Gossip;
+
+
 import static main.java.pt.ist.p2p.tomp2p.getGossip;
 
 public class tomp2p {
@@ -49,7 +51,7 @@ public class tomp2p {
                 .setUdpPort(porto).setBindings(b)
                 .setEnableIndirectReplication(true).makeAndListen();
 
-		InetAddress address = Inet4Address.getByName("127.0.0.1");
+		InetAddress address = Inet4Address.getByName("194.210.222.55");
 
 		PeerAddress peerAddress = new PeerAddress(new Number160(1), address,
 				10001, 10001);
@@ -382,7 +384,7 @@ public class tomp2p {
             Scanner keyboard2 = new Scanner(System.in);
             String username = keyboard2.nextLine();
             System.out.println("Pass:");
-            String pass = keyboard2.nextLine();
+
 
             try{
             
@@ -414,7 +416,6 @@ public class tomp2p {
 			String username = keyboard1.nextLine();
             
 			System.out.println("Password:");
-			String pass = keyboard1.nextLine();;
 			if(!RegisterServiceDHT.userExists(peer1, username)){
 				
     			u.setUsername(username);
@@ -426,15 +427,14 @@ public class tomp2p {
 			}
 		}
      }
-	
 
-     public static Gossip getGossip() {
-         return gossip;
-     }
+    public static Gossip getGossip() {
+        return gossip;
+    }
 
-     public Peer getPeer1() { return peer1; }
+    public Peer getPeer1() { return peer1; }
 
-     public User getU() { return u; }
+    public User getU() { return u; }
 
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 
