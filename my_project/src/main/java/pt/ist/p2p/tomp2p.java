@@ -46,12 +46,14 @@ public class tomp2p {
 	public static Peer PeerBuilder(String port) throws ClassNotFoundException,
 			IOException {
 
+        int porto = Integer.parseInt(port) + new Random().nextInt(3000);
+
 		Bindings b = new Bindings();
 
-		peer1 = new PeerMaker(new Number160(rnd.nextInt()))
-				.setTcpPort(Integer.parseInt(port))
-				.setUdpPort(Integer.parseInt(port)).setBindings(b)
-				.setEnableIndirectReplication(true).makeAndListen();
+        peer1 = new PeerMaker(new Number160(rnd.nextInt()))
+                .setTcpPort(porto)
+                .setUdpPort(porto).setBindings(b)
+                .setEnableIndirectReplication(true).makeAndListen();
 
 		InetAddress address = Inet4Address.getByName("127.0.0.1");
 
@@ -372,7 +374,7 @@ public class tomp2p {
 
 	public static void passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
-	    User user = null;
+	    User user;
         System.out.println("Do you have an account?");
         Scanner keyboard1 = new Scanner(System.in);
         String s = keyboard1.nextLine();
