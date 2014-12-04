@@ -15,7 +15,7 @@ public class loggingService {
         {
             String filename= "logs/gossipLogs";
             FileWriter fw = new FileWriter(filename,true);
-            fw.write("\nNUMBER OF NODES: " + numberOfNodes + " AT TIME: " + sdf.format(data)+ "\n");
+            //fw.write("\nNUMBER OF NODES: " + numberOfNodes + " AT TIME: " + sdf.format(data)+ "\n");
             fw.close();
         }
         catch(IOException ioe)
