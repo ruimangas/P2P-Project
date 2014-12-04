@@ -8,13 +8,12 @@ public class CodeDeploy {
 	public static void main(String[] args) throws IOException{
  
 		String file = args[0];
-		String pasta = args[1];
 		String nodes = "nodes.txt";
 		BufferedReader br = new BufferedReader(new FileReader(nodes));
 		String host;
 		
 		while ((host = br.readLine()) != null) {
-   			String command = "scp -r " + file + " istple_seprs4@" + host + ":" + pasta;
+   			String command = "scp -r " + file + " istple_seprs4@" + host + ":";
 			System.out.println(command);
 
 			CodeDeploy obj = new CodeDeploy(); 
