@@ -17,11 +17,6 @@ import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.storage.Data;
 
-
-
-
-
-
 public class SeeItemsDetailsServiceDHT {
 	
 	private static String OFFITEMS = "offeredItems";

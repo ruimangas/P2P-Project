@@ -2,10 +2,6 @@ package main.java.pt.ist.p2p;
 
 import java.io.Serializable;
 
-
-   
-   
- 
 public class Bid implements Serializable{
 	
 	private static final long serialVersionUID = 1L;

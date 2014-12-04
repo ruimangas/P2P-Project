@@ -5,6 +5,7 @@ import main.java.pt.ist.p2p.masterPeer;
 import main.java.pt.ist.p2p.tomp2p;
 
 import java.io.*;
+import java.util.Date;
 
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.replication.ReplicationExecutor;
@@ -30,21 +31,6 @@ public class Gossip {
     private double messageId = 0;
 
     public Gossip(){
-
-    }
-
-    public int calculateReplicationFactor(){
-
-        int replicationFactor;
-
-        int s = new tomp2p().getPeer1().getPeerBean().getPeerMap().getAll().size();
-
-        if(s<5){
-            replicationFactor = s+1;
-        }
-        else replicationFactor = 6;
-
-        return replicationFactor;
 
     }
 
@@ -114,10 +100,12 @@ public class Gossip {
         this.messageId = this.messageId + 1;
     }
 
-    public synchronized void process(Message msg){
+    public synchronized void process(Message msg) throws IOException {
 
 
         if(msg.getmType().toString().equals("NODES_SUM")) {
+
+            loggingService.log(String.valueOf(Math.round(msg.getValue()/msg.getWeight())), new Date());
 
             this.nodesSumValue = this.nodesSumValue + msg.getValue();
             this.nodesWeightValue = this.nodesWeightValue + msg.getWeight();
@@ -179,7 +167,7 @@ public class Gossip {
 
         if(messageType.toString().equals("ITEMS_SUM")){
 
-            return (this.numItemsSum/this.numItemsWeight)/calculateReplicationFactor();
+            return (this.numItemsSum/this.numItemsWeight);
 
         }
         return 0;
@@ -189,7 +177,7 @@ public class Gossip {
 
         if(messageType.toString().equals("USERS_SUM")){
 
-            return (this.numUsersValue/this.numUsersWeight)/calculateReplicationFactor();
+            return (this.numUsersValue/this.numUsersWeight);
         }
 
         return 0;
@@ -204,11 +192,15 @@ public class Gossip {
 
     public void resetGossipFiles(Peer peer) throws IOException, ClassNotFoundException {
 
+        //System.out.println("ITEMS: " + StorageService.countStoredStuff("ItemSimple", peer));
+
         this.numItemsSum = StorageService.countStoredStuff("ItemSimple", peer);
         this.numItemsWeight = this.initialItemsWeight;
     }
 
     public void resetGossipUsers(Peer peer) throws IOException, ClassNotFoundException {
+
+        //System.out.println("USERS: " + StorageService.countStoredStuff("User", peer));
 
         this.numUsersValue = StorageService.countStoredStuff("User", peer);
         this.numUsersWeight = this.initialNumUsersWeight;

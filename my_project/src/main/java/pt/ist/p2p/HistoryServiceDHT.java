@@ -18,10 +18,6 @@ import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.storage.Data;
 
-
-
-
-
 public class HistoryServiceDHT {
 
 	private static Number160 PURCHASEDITEMS = Number160.createHash("purchasedItems");
@@ -37,7 +33,7 @@ public class HistoryServiceDHT {
 		
 		Iterator<Data> iteratorItemsBidded = futureGetBidded.getDataMap().values().iterator();
 		Iterator<Data> iteratorItemsPurchased = futureGetPurchased.getDataMap().values().iterator();
-		
+
 		Object o;
 		
 		int counterItem = 0;

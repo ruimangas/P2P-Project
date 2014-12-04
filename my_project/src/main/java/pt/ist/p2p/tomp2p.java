@@ -19,6 +19,8 @@ import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
 import main.java.pt.ist.gossip.Gossip;
+
+
 import static main.java.pt.ist.p2p.tomp2p.getGossip;
 
 public class tomp2p {
@@ -40,24 +42,20 @@ public class tomp2p {
 	public static Peer PeerBuilder(String port) throws ClassNotFoundException,
 			IOException {
 
+        int porto = Integer.parseInt(port) + new Random().nextInt(3000);
+
 		Bindings b = new Bindings();
 
-		peer1 = new PeerMaker(new Number160(rnd.nextInt()))
-				.setTcpPort(Integer.parseInt(port))
-				.setUdpPort(Integer.parseInt(port)).setBindings(b)
-				.setEnableIndirectReplication(true).makeAndListen();
+        peer1 = new PeerMaker(new Number160(rnd.nextInt())).setTcpPort(porto).setUdpPort(porto).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
 
 		InetAddress address = Inet4Address.getByName("127.0.0.1");
 
-		PeerAddress peerAddress = new PeerAddress(new Number160(1), address,
-				10001, 10001);
+		PeerAddress peerAddress = new PeerAddress(new Number160(1), address,10001, 10001);
 
-		FutureDiscover future = peer1.discover().setPeerAddress(peerAddress)
-				.start();
+		FutureDiscover future = peer1.discover().setPeerAddress(peerAddress).start();
 		future.awaitUninterruptibly();
 
-		FutureBootstrap future1 = peer1.bootstrap().setPeerAddress(peerAddress)
-				.start();
+		FutureBootstrap future1 = peer1.bootstrap().setPeerAddress(peerAddress).start();
 		future1.awaitUninterruptibly();
 
 		try {
@@ -223,43 +221,35 @@ public class tomp2p {
 		String[] choice = s.split("[ ]");
 		keyboard1.close();
 		List<String> myOperators = new ArrayList<String>();
-		List<String> myOperands = new ArrayList<String>();
 		List<String> myQuery = new ArrayList<String>();
 		List<Number160> hashSimple;
 
 		for (String st : choice) {
 			if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
 				myOperators.add(st.toLowerCase());
-			else
-				myOperands.add(st);
+			
 			myQuery.add(st);
 		}
 
-		
-		
-		
 		try {
 
 		    if (myOperators.size() == 0) {
 
-		        hashSimple = new ArrayList<Number160>();
-
-		        hashSimple = SearchServiceDHT.findReference(peer1,
-		                myOperands.get(0));
-
-		        itemSimples = SearchServiceDHT.search(peer1, hashSimple);
+                hashSimple = SearchServiceDHT.findReference(peer1,myQuery.get(0));
+                itemSimples = SearchServiceDHT.search(peer1, hashSimple);
 
 		    } else {
-
-		        itemSimples = SearchServiceDHT.booleanSearch(peer1,
-		                myOperators, myOperands, myQuery);
+                    
+		        itemSimples = SearchServiceDHT.booleanSearch(peer1,myOperators, myQuery);
 
 		    }
+		    
 		    items = SearchServiceDHT.searchItem(peer1, itemSimples);
 
 
 		} catch (Exception e) {
 		    System.out.println(e.toString());
+		    SearchServiceDHT.clearMySearch();
 		    return;
 
 		}
@@ -369,7 +359,7 @@ public class tomp2p {
 
 	public static void passVerifier(Peer peer1) throws ClassNotFoundException, IOException {
 
-	    User user = null;
+	    User user;
         System.out.println("Do you have an account?");
         Scanner keyboard1 = new Scanner(System.in);
         String s = keyboard1.nextLine();
@@ -380,7 +370,7 @@ public class tomp2p {
             Scanner keyboard2 = new Scanner(System.in);
             String username = keyboard2.nextLine();
             System.out.println("Pass:");
-            String pass = keyboard2.nextLine();
+
 
             try{
             
@@ -412,7 +402,6 @@ public class tomp2p {
 			String username = keyboard1.nextLine();
             
 			System.out.println("Password:");
-			String pass = keyboard1.nextLine();;
 			if(!RegisterServiceDHT.userExists(peer1, username)){
 				
     			u.setUsername(username);
@@ -424,25 +413,31 @@ public class tomp2p {
 			}
 		}
      }
-	
 
-     public static Gossip getGossip() {
-         return gossip;
-     }
+    public static Gossip getGossip() {
+        return gossip;
+    }
 
-     public Peer getPeer1() { return peer1; }
+    public Peer getPeer1() { return peer1; }
 
-     public User getU() { return u; }
+    public User getU() { return u; }
 
-	public static void main(String[] args) throws ClassNotFoundException, IOException {
+	public static void main(String[] args)  {
 
 		tomp2p tom = new tomp2p();
 
+		
+		try{
 		Peer p = tomp2p.PeerBuilder(args[0]);
 
 		passVerifier(p);
 		GossipService.setGossipValues(u,getGossip(),peer1);
 		GossipService.setupReplyHandler(peer1, getGossip());
+		
+		}catch(Exception e){
+		    System.out.println(e.getMessage());
+		}
+		
 		new sendThread(tom).start();
 		tomp2p.comandLine();
 
