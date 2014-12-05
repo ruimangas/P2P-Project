@@ -1,0 +1,17 @@
+planetlab1.eecs.jacobs-university.de
+iraplab2.iralab.uni-karlsruhe.de
+planetlab1.di.unito.it
+ple2.ipv6.lip6.fr
+ple1.dmcs.p.lodz.pl
+planetlab1.cs.uoi.gr
+planetlab1.ifi.uio.no
+onelab3.warsaw.rd.tp.pl
+planetlab1.rd.tut.fi
+planetlab2.jcp-consult.net
+host2.planetlab.informatik.tu-darmstadt.de
+prata.mimuw.edu.pl
+aladdin.planetlab.extranet.uni-passau.de
+planet1.l3s.uni-hannover.de
+mars.planetlab.haw-hamburg.de
+planetlab4.cs.st-andrews.ac.uk
+planetlab-2.tagus.ist.utl.pt
