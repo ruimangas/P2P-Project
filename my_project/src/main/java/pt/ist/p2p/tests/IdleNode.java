@@ -71,7 +71,7 @@ public class IdleNode {
             e.printStackTrace();
         }
         
-        System.out.println("Hello, I´m just a idle dude. Im only here to be a part of the network :D");
+        System.out.println("Hello, Im just a idle dude. Im only here to be a part of the network :D");
     }
     
 }
