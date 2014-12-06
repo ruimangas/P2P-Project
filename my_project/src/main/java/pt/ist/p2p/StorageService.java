@@ -19,15 +19,13 @@ public class StorageService {
 
         StorageGeneric storage = peer.getPeerBean().getStorage();
 
-        storage.checkTimeout();
-
         Map<Number480, Data> map = peer.getPeerBean().getStorage().map();
 
         for (Map.Entry<Number480, Data> entry : map.entrySet()) {
 
             Number160 peerResponsible = storage.findPeerIDForResponsibleContent(entry.getKey().getLocationKey());
 
-            if (peerResponsible.equals(peer.getPeerID())) {
+            if (peerResponsible.equals(peer.getPeerID())){
 
                 String classN = entry.getValue().getObject().getClass().getName();
 

@@ -105,7 +105,7 @@ public class Gossip {
 
         if(msg.getmType().toString().equals("NODES_SUM")) {
 
-            loggingService.log(String.valueOf(Math.round(msg.getValue()/msg.getWeight())), new Date());
+            loggingService.log(String.valueOf(Math.round(msg.getValue()/msg.getWeight())), String.valueOf(0));
 
             this.nodesSumValue = this.nodesSumValue + msg.getValue();
             this.nodesWeightValue = this.nodesWeightValue + msg.getWeight();
@@ -113,6 +113,9 @@ public class Gossip {
         }
 
         if(msg.getmType().toString().equals("ITEMS_SUM")){
+
+
+            loggingService.log(String.valueOf(0),String.valueOf(Math.round(msg.getValue()/msg.getWeight())));
 
             this.numItemsSum = this.numItemsSum + msg.getValue();
             this.numItemsWeight = this.numItemsWeight + msg.getWeight();
@@ -192,7 +195,7 @@ public class Gossip {
 
     public void resetGossipFiles(Peer peer) throws IOException, ClassNotFoundException {
 
-        //System.out.println("ITEMS: " + StorageService.countStoredStuff("ItemSimple", peer));
+        System.out.println("ITEMS: " + StorageService.countStoredStuff("ItemSimple", peer));
 
         this.numItemsSum = StorageService.countStoredStuff("ItemSimple", peer);
         this.numItemsWeight = this.initialItemsWeight;
@@ -200,7 +203,7 @@ public class Gossip {
 
     public void resetGossipUsers(Peer peer) throws IOException, ClassNotFoundException {
 
-       // System.out.println("USERS: " + StorageService.countStoredStuff("User", peer));
+        System.out.println("USERS: " + StorageService.countStoredStuff("User", peer));
 
         this.numUsersValue = StorageService.countStoredStuff("User", peer);
         this.numUsersWeight = this.initialNumUsersWeight;
