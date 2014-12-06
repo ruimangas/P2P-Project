@@ -46,22 +46,18 @@ public class tomp2p {
 
 		Bindings b = new Bindings();
 
-        peer1 = new PeerMaker(new Number160(rnd.nextInt()))
-                .setTcpPort(porto)
-                .setUdpPort(porto).setBindings(b)
-                .setEnableIndirectReplication(true).makeAndListen();
+
+        peer1 = new PeerMaker(new Number160(rnd.nextInt())).setTcpPort(porto).setUdpPort(porto).setBindings(b).setEnableIndirectReplication(true).makeAndListen();
+
 
 		InetAddress address = Inet4Address.getByName("194.210.221.61");
 
-		PeerAddress peerAddress = new PeerAddress(new Number160(1), address,
-				10001, 10001);
+		PeerAddress peerAddress = new PeerAddress(new Number160(1), address,10001, 10001);
 
-		FutureDiscover future = peer1.discover().setPeerAddress(peerAddress)
-				.start();
+		FutureDiscover future = peer1.discover().setPeerAddress(peerAddress).start();
 		future.awaitUninterruptibly();
 
-		FutureBootstrap future1 = peer1.bootstrap().setPeerAddress(peerAddress)
-				.start();
+		FutureBootstrap future1 = peer1.bootstrap().setPeerAddress(peerAddress).start();
 		future1.awaitUninterruptibly();
 
 		try {
@@ -227,43 +223,35 @@ public class tomp2p {
 		String[] choice = s.split("[ ]");
 		keyboard1.close();
 		List<String> myOperators = new ArrayList<String>();
-		List<String> myOperands = new ArrayList<String>();
 		List<String> myQuery = new ArrayList<String>();
 		List<Number160> hashSimple;
 
 		for (String st : choice) {
 			if (st.toLowerCase().equals("and") || st.toLowerCase().equals("or") || st.toLowerCase().equals("not"))
 				myOperators.add(st.toLowerCase());
-			else
-				myOperands.add(st);
+			
 			myQuery.add(st);
 		}
 
-		
-		
-		
 		try {
 
 		    if (myOperators.size() == 0) {
 
-		        hashSimple = new ArrayList<Number160>();
-
-		        hashSimple = SearchServiceDHT.findReference(peer1,
-		                myOperands.get(0));
-
-		        itemSimples = SearchServiceDHT.search(peer1, hashSimple);
+                hashSimple = SearchServiceDHT.findReference(peer1,myQuery.get(0));
+                itemSimples = SearchServiceDHT.search(peer1, hashSimple);
 
 		    } else {
-
-		        itemSimples = SearchServiceDHT.booleanSearch(peer1,
-		                myOperators, myOperands, myQuery);
+                    
+		        itemSimples = SearchServiceDHT.booleanSearch(peer1,myOperators, myQuery);
 
 		    }
+		    
 		    items = SearchServiceDHT.searchItem(peer1, itemSimples);
 
 
 		} catch (Exception e) {
 		    System.out.println(e.toString());
+		    SearchServiceDHT.clearMySearch();
 		    return;
 
 		}
@@ -436,15 +424,22 @@ public class tomp2p {
 
     public User getU() { return u; }
 
-	public static void main(String[] args) throws ClassNotFoundException, IOException {
+	public static void main(String[] args)  {
 
 		tomp2p tom = new tomp2p();
 
+		
+		try{
 		Peer p = tomp2p.PeerBuilder(args[0]);
 
 		passVerifier(p);
 		GossipService.setGossipValues(u,getGossip(),peer1);
 		GossipService.setupReplyHandler(peer1, getGossip());
+		
+		}catch(Exception e){
+		    System.out.println(e.getMessage());
+		}
+		
 		new sendThread(tom).start();
 		tomp2p.comandLine();
 

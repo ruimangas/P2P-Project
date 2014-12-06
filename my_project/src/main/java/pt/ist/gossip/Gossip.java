@@ -203,8 +203,6 @@ public class Gossip {
 
     public void resetGossipUsers(Peer peer) throws IOException, ClassNotFoundException {
 
-        System.out.println("USERS: " + StorageService.countStoredStuff("User", peer));
-
         this.numUsersValue = StorageService.countStoredStuff("User", peer);
         this.numUsersWeight = this.initialNumUsersWeight;
 

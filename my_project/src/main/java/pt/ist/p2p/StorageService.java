@@ -19,6 +19,7 @@ public class StorageService {
 
         StorageGeneric storage = peer.getPeerBean().getStorage();
 
+
         Map<Number480, Data> map = peer.getPeerBean().getStorage().map();
 
         for (Map.Entry<Number480, Data> entry : map.entrySet()) {

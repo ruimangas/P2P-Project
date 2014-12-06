@@ -26,9 +26,10 @@ public class SearchServiceDHT {
 
  
    
-   private static List<Number160> myCandidates = new ArrayList<Number160>();
+   private static List<List<Number160>> myNotOperands = new ArrayList<List<Number160>>();
    private static Number160 domainKey = Number160.createHash("ITEMS");
-   private static List<Number160> myInitialSearch;
+   private static List<List<Number160>> mySearches = new ArrayList<List<Number160>>();
+   
    
    public static List<Number160> findReference(Peer peer,String index) throws ClassNotFoundException, IOException{
        
@@ -135,132 +136,120 @@ public class SearchServiceDHT {
    
    
    
-    public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myOperands,List<String> myQuery) throws ClassNotFoundException, IOException{
+    public static List<ItemSimple> booleanSearch(Peer myPeer,List<String> myOperators,List<String> myQuery) throws ClassNotFoundException, IOException{
                   
             
-             int numOperands = myOperands.size();
-             List<ItemSimple> theOnes = new ArrayList<ItemSimple>();
-           
-             String myOperator = "";
-             List<Number160> mySearch;
-             List<List<Number160>> mySearches = new ArrayList<List<Number160>>();
-             List<List<Number160>> myNotOperands = new ArrayList<List<Number160>>();
-             List<String> notOperands = new ArrayList<String>();
+        List<ItemSimple> theOnes = new ArrayList<ItemSimple>();
+        List<Number160> mySearch;
             
-             
-             if(myOperators.get(0).equals("not"))
-                 throw new QueryRejectedException();
-             
-             for(int k=0;k<myQuery.size();k++){
-                 
-                 if(myQuery.get(k).equals("not")){
-                     notOperands.add(myQuery.get(k+1));
-                     myOperators.remove("not");
-                 }
-                 
-             }
-             
-             if(myOperands.size() - myOperators.size() != 1)
-                 throw new QueryRejectedException();
-                 
-             for(int j=0;j<numOperands;j++){
-                 
-                 mySearch = new ArrayList<Number160>();
-                 mySearch = findReference(myPeer,myOperands.get(j));
-                 
-                 if(notOperands.contains(myOperands.get(j))){
-                     myNotOperands.add(mySearch);
-                     notOperands.remove(myOperands.get(j));
-                 }
-                 
-                 mySearches.add(mySearch);
-                 
-             }
-             
-             
-         
-          myInitialSearch = mySearches.get(0);
-          
-          myCandidates = myInitialSearch;
-          
-            for(int i=myOperators.size() -1, m=1 ;i>=0;i-- , m++){
-          
-                 myOperator = myOperators.get(i);
-                 
-                 if(numOperands > 1)
-                    theChosenOnes(myOperator,mySearches.get(m),myNotOperands);
-                 else
-                     throw new QueryRejectedException();
-                 
-            } 
-             
-            if(myCandidates.isEmpty())
-                throw new ResultsNotFoundException();
-               
-           theOnes = search(myPeer,myCandidates);   
-           
-           return theOnes;
-            
-     }
-        
-    
-    public static void theChosenOnes(String myOperator, List<Number160> secondSearch, List<List<Number160>> myNotOperands){
-                
-        
-        if(myOperator.equals("and")){
-           
-            if(myNotOperands.contains(secondSearch) && myNotOperands.contains(myInitialSearch))
-                throw new QueryRejectedException();
-            
-            
-              
-            
-            for(List<Number160> list : myNotOperands){
 
-                if(list.containsAll(secondSearch)){
+        if(myOperators.get(0).equals("not"))
+            throw new QueryRejectedException();
 
-                    myCandidates.removeAll(secondSearch);
-                    myNotOperands.remove(list);
-                    return;
-                }
-                
-                if(list.containsAll(myInitialSearch)){
+        String myWord = "";
+        int size = 0;
 
-                    myCandidates = secondSearch;
-                    myCandidates.removeAll(list);
-                    myInitialSearch.clear();
-                    return;
-                }
+        for(int k=myQuery.size() - 1;k>=0;k--){
+
+            myWord = myQuery.get(k);
+
+            if((myWord.equals("and"))){
+                and();
+
+            }else if(myWord.equals("or")){
+                or();
+
+            }else if(myWord.equals("not")){
+                size = mySearches.size();
+                mySearch = mySearches.get(size - 1);
+                myNotOperands.add(mySearch);
+
+            }else{
+
+                mySearch = findReference(myPeer,myWord);
+                mySearches.add(mySearch);
 
             }
-            
-            
-           myCandidates.retainAll(secondSearch);
-        }    
-        
-        
-        if(myOperator.equals("or")){
-                
-            if(myNotOperands.contains(myInitialSearch) || myNotOperands.contains(secondSearch))
-               throw new QueryRejectedException();
-            
-            
-                   
-            for(Number160 hash : secondSearch){
-                  if(!(myCandidates.contains(hash)))
-                      myCandidates.add(hash);
-                    
-                }
-            }
-        
-        
-      }
+
+        }
+
+
+        if(mySearches.get(0).isEmpty())
+            throw new ResultsNotFoundException();
+
+
+        theOnes = search(myPeer,mySearches.get(0));   
+
+        return theOnes;
+
+    }
     
-   public static void clearMySearch(){
-       
-       myCandidates.clear();
-   }
-   
+        
+    public static void and(){
+
+        int numOperands = mySearches.size();
+        Integer posOne = numOperands -1;
+        Integer posTwo = numOperands -2;
+        List<Number160> firstOperand = mySearches.get(posOne);
+        List<Number160> secondOperand = mySearches.get(posTwo);
+
+        mySearches.remove(firstOperand);
+        mySearches.remove(secondOperand);
+
+
+
+        if(myNotOperands.contains(firstOperand) && myNotOperands.contains(secondOperand)){
+            throw new QueryRejectedException();
+
+        }else if(myNotOperands.contains(firstOperand)){
+
+            secondOperand.removeAll(firstOperand);
+            mySearches.add(secondOperand);
+            myNotOperands.remove(firstOperand);
+
+        }else if(myNotOperands.contains(secondOperand)){
+
+            firstOperand.removeAll(secondOperand);
+            mySearches.add(firstOperand);
+            myNotOperands.remove(secondOperand);
+
+        }else{
+
+            firstOperand.retainAll(secondOperand);
+            mySearches.add(firstOperand);
+        }
+
+    }
+
+    public static void or(){
+
+        int numOperands = mySearches.size();
+        List<Number160> firstOperand = mySearches.get(numOperands -1);
+        List<Number160> secondOperand = mySearches.get(numOperands -2);
+
+        mySearches.remove(firstOperand);
+        mySearches.remove(secondOperand);
+
+        if(myNotOperands.contains(firstOperand) || myNotOperands.contains(secondOperand))
+            throw new QueryRejectedException();
+
+        for(Number160 hash : firstOperand){
+            if(!(secondOperand.contains(hash)))
+                secondOperand.add(hash);
+        }
+
+        mySearches.add(secondOperand);
+
+
+    }
+
+
+    public static void clearMySearch(){
+
+        mySearches.clear();
+        myNotOperands.clear();
+    }
+
    public static void listItems(List<Item> items) {
 		int i = 1;
       System.out.println("****************** Results *********************");

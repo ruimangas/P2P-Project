@@ -85,7 +85,60 @@
 			</java>
 		  </target>
 	
-	
+	<target name="runTestAddItem" depends="compile" description="Runs the program">
+        <java classname="main.java.pt.ist.p2p.tests.TestAddItem" fork="no">
+          <arg value="${arg0}" />
+        <classpath>
+          <path refid="project.classpath" />
+        </classpath>
+      </java>
+      </target>
+  
+  <target name="runTestSearchItem" depends="compile" description="Runs the program">
+        <java classname="main.java.pt.ist.p2p.tests.TestSearchItem" fork="no">
+          <arg value="${arg0}" />
+        <classpath>
+          <path refid="project.classpath" />
+        </classpath>
+      </java>
+      </target>
+  
+  <target name="runTestAddBid" depends="compile" description="Runs the program">
+        <java classname="main.java.pt.ist.p2p.tests.TestAddBid" fork="no">
+          <arg value="${arg0}" />
+        <classpath>
+          <path refid="project.classpath" />
+        </classpath>
+      </java>
+      </target>
+
+  <target name="runTestAcceptBid" depends="compile" description="Runs the program">
+        <java classname="main.java.pt.ist.p2p.tests.TestAcceptBid" fork="no">
+          <arg value="${arg0}" />
+        <classpath>
+          <path refid="project.classpath" />
+        </classpath>
+      </java>
+      </target>
+  
+  <target name="runTestSearchItemRemoved" depends="compile" description="Runs the program">
+        <java classname="main.java.pt.ist.p2p.tests.TestSearchItemRemoved" fork="no">
+          <arg value="${arg0}" />
+        <classpath>
+          <path refid="project.classpath" />
+        </classpath>
+      </java>
+      </target>
+      
+  <target name="runIdle" depends="compile" description="Runs the program">
+        <java classname="main.java.pt.ist.p2p.tests.IdleNode" fork="no">
+          <arg value="${arg0}" />
+        <classpath>
+          <path refid="project.classpath" />
+        </classpath>
+      </java>
+      </target>
+
 	
 	
 	
